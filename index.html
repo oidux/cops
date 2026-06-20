@@ -213,7 +213,7 @@ p{font-size:1rem;line-height:1.65;color:var(--mid);max-width:520px}
 .cs-card{padding:12px 14px}
 .cs-head{display:flex;align-items:center;gap:7px;padding-bottom:8px;margin-bottom:4px;border-bottom:1px solid var(--border);font-size:.6rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--light)}
 .cs-h-name{flex:1}
-.cs-h-lv{width:78px;text-align:center;flex-shrink:0}
+.cs-h-lv{width:108px;text-align:center;flex-shrink:0}
 .cs-h-hrs{width:38px;text-align:center;flex-shrink:0}
 .cs-h-sub{width:74px;text-align:right;flex-shrink:0}
 .cs-row{display:flex;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid rgba(208,204,195,.5);cursor:pointer;transition:opacity .2s}
@@ -224,9 +224,13 @@ p{font-size:1rem;line-height:1.65;color:var(--mid);max-width:520px}
 .cs-cb svg{width:9px;height:9px;opacity:0}
 .cs-row.on .cs-cb svg,.cs-saas.on .cs-cb svg{opacity:1}
 .cs-name{flex:1;font-size:.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cs-lv{display:flex;gap:3px;width:78px;flex-shrink:0}
-.cs-lvb{flex:1;font-size:.6rem;font-weight:700;text-align:center;padding:4px 0;border-radius:5px;background:var(--bg);border:1px solid var(--border);color:var(--light);cursor:pointer;transition:all .15s}
-.cs-lvb.on{background:var(--dark);color:#fff;border-color:var(--dark)}
+.cs-lv{display:flex;align-items:center;gap:7px;width:108px;flex-shrink:0}
+.cs-snr{flex:1;min-width:0;-webkit-appearance:none;height:3px;border-radius:2px;background:var(--border);outline:none;cursor:pointer}
+.cs-snr::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--dark);cursor:pointer;transition:transform .12s}
+.cs-snr::-webkit-slider-thumb:hover{transform:scale(1.2)}
+.cs-snr-v{width:30px;flex-shrink:0;text-align:center;font-size:.62rem;font-weight:800;letter-spacing:.02em;color:var(--dark);line-height:1}
+.cs-snr-v small{display:block;font-size:.52rem;font-weight:700;color:var(--light);letter-spacing:.03em}
+.cs-row.off .cs-snr-v,.cs-row.off .cs-snr-v small{color:var(--light)}
 .cs-hrs{width:38px;flex-shrink:0;font-family:inherit;font-size:.72rem;font-weight:700;text-align:center;color:var(--dark);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 2px;outline:none}
 .cs-hrs:focus{border-color:var(--dark)}
 .cs-sub{width:74px;text-align:right;flex-shrink:0;font-size:.76rem;font-weight:700;color:var(--dark)}
@@ -940,29 +944,43 @@ const csSaasData=[
 const csCur={BRL:{loc:'pt-BR',code:'BRL',usd:5.1},USD:{loc:'en-US',code:'USD',usd:1},EUR:{loc:'de-DE',code:'EUR',usd:0.92}};
 const COPS_BRL=10000; // preço COps em R$
 // estado: cada função {on, lvl(0..2), hrs}; cada saas {on}
-const csState=csRoles.map((r,i)=>({on:false,lvl:1,hrs:160}));
+const csState=csRoles.map((r,i)=>({on:false,snr:5,hrs:160}));
 const csSaasState=csSaasData.map((s,i)=>({on:false}));
 let csCurKey='BRL';
 const CHK='<svg viewBox="0 0 10 10"><path d="M1 5l2.5 2.5L9 2" fill="none" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
 function csFmt(v){return new Intl.NumberFormat(csCur[csCurKey].loc,{style:'currency',currency:csCur[csCurKey].code,maximumFractionDigits:0}).format(v);}
+// interpola taxa/hora pela senioridade 1→10 (1=Jr · 5,5=Pl · 10=Sr)
+function csRate(i,snr){
+  const r=csRoles[i][csCurKey];
+  if(snr<=5.5){const t=(snr-1)/4.5;return r[0]+(r[1]-r[0])*t;}
+  const t=(snr-5.5)/4.5;return r[1]+(r[2]-r[1])*t;
+}
+function csTier(snr){return snr<=3?'Jr':snr<=7?'Pl':'Sr';}
 
 function csBuild(){
   const tbl=document.getElementById('csTable');tbl.innerHTML='';
   csRoles.forEach((r,i)=>{
-    const row=document.createElement('div');row.className='cs-row'+(csState[i].on?' on':' off');
+    const st=csState[i];
+    const row=document.createElement('div');row.className='cs-row'+(st.on?' on':' off');
     row.innerHTML='<div class="cs-cb">'+CHK+'</div>'+
       '<div class="cs-name">'+r.n+'</div>'+
-      '<div class="cs-lv">'+['JR','PL','SR'].map((l,j)=>'<div class="cs-lvb'+(csState[i].lvl===j?' on':'')+'" data-lv="'+j+'">'+l+'</div>').join('')+'</div>'+
-      '<input class="cs-hrs" type="text" inputmode="numeric" value="'+csState[i].hrs+'">'+
+      '<div class="cs-lv"><input class="cs-snr" type="range" min="1" max="10" value="'+st.snr+'"><span class="cs-snr-v">'+st.snr+'<small>'+csTier(st.snr)+'</small></span></div>'+
+      '<input class="cs-hrs" type="text" inputmode="numeric" value="'+st.hrs+'">'+
       '<div class="cs-sub" data-sub></div>';
-    // toggle on/off (click row, but not on level/hrs)
-    row.querySelector('.cs-cb').addEventListener('click',e=>{e.stopPropagation();csState[i].on=!csState[i].on;csBuild();});
-    row.querySelector('.cs-name').addEventListener('click',()=>{csState[i].on=!csState[i].on;csBuild();});
-    row.querySelectorAll('.cs-lvb').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();csState[i].lvl=+b.dataset.lv;csState[i].on=true;csBuild();}));
+    row.querySelector('.cs-cb').addEventListener('click',e=>{e.stopPropagation();st.on=!st.on;csBuild();});
+    row.querySelector('.cs-name').addEventListener('click',()=>{st.on=!st.on;csBuild();});
+    const snr=row.querySelector('.cs-snr'),snrv=row.querySelector('.cs-snr-v');
+    snr.addEventListener('click',e=>e.stopPropagation());
+    snr.addEventListener('input',()=>{
+      st.snr=+snr.value;st.on=true;
+      row.classList.add('on');row.classList.remove('off');
+      snrv.innerHTML=st.snr+'<small>'+csTier(st.snr)+'</small>';
+      csCalc();
+    });
     const hrs=row.querySelector('.cs-hrs');
     hrs.addEventListener('click',e=>e.stopPropagation());
-    hrs.addEventListener('input',()=>{csState[i].hrs=Math.max(0,Math.min(320,parseInt(hrs.value)||0));csCalc();});
+    hrs.addEventListener('input',()=>{st.hrs=Math.max(0,Math.min(320,parseInt(hrs.value)||0));csCalc();});
     tbl.appendChild(row);
   });
   const sa=document.getElementById('csSaas');sa.innerHTML='';
@@ -978,8 +996,7 @@ function csBuild(){
 function csCalc(){
   let total=0;
   document.querySelectorAll('#csTable .cs-row').forEach((row,i)=>{
-    const rate=csRoles[i][csCurKey][csState[i].lvl];
-    const sub=rate*csState[i].hrs;
+    const sub=csRate(i,csState[i].snr)*csState[i].hrs;
     if(csState[i].on)total+=sub;
     row.querySelector('[data-sub]').textContent=csState[i].on?csFmt(sub):'—';
   });
