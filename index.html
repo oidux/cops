@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COps — Pitch Interativo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#ECEAE3;--card:#E2DFD8;--border:#D0CCC3;--green:#AAEE44;--dark:#1A1A1A;--mid:#5C5C5C;--light:#9A9A9A;--panel:#F0EDE6;--pc:#E6E2DA}
+html{font-size:16px}
+body{font-family:'Instrument Sans',sans-serif;background:var(--bg);color:var(--dark);display:flex;height:100vh;overflow:hidden}
+
+/* narrative */
+.narrative{width:58%;height:100vh;overflow:hidden;scroll-behavior:smooth;position:relative}
+.narrative::-webkit-scrollbar{width:4px}
+.narrative::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.section{min-height:100vh;padding:72px 64px;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.section::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:36px 36px;opacity:.32;pointer-events:none}
+.sc{position:relative;z-index:1}
+
+/* type */
+.lbl{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--light);margin-bottom:18px}
+h1{font-size:clamp(2.4rem,4vw,3.4rem);font-weight:700;line-height:1.06;margin-bottom:20px}
+h2{font-size:clamp(1.6rem,2.8vw,2.4rem);font-weight:700;line-height:1.1;margin-bottom:18px}
+p{font-size:1rem;line-height:1.65;color:var(--mid);max-width:520px}
+.em{font-weight:700;color:var(--dark)}
+
+/* hero */
+.hero-story{font-size:1.05rem;line-height:1.8;color:var(--mid);max-width:500px;margin-bottom:32px;min-height:4em}
+.cursor{display:inline-block;width:2px;height:1.1em;background:var(--dark);margin-left:2px;vertical-align:text-bottom;animation:blink .9s step-end infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.hero-reveal{opacity:0;transform:translateY(10px);transition:opacity .6s ease,transform .6s ease}
+.hero-reveal.show{opacity:1;transform:translateY(0)}
+
+/* chips */
+.chip-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.chip{border-radius:8px;padding:9px 16px;font-size:.82rem;font-weight:600}
+.chip.solid{background:var(--green);color:var(--dark)}
+.chip.outline{border:1px solid var(--border);color:var(--mid)}
+
+/* toggle */
+.toggle-wrap{margin-top:28px}
+.toggle-tabs{display:flex;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:4px;width:fit-content;margin-bottom:16px}
+.toggle-tab{padding:7px 18px;border-radius:7px;font-size:.84rem;font-weight:600;cursor:pointer;color:var(--mid);transition:all .2s}
+.toggle-tab.active{background:var(--dark);color:#fff}
+.toggle-panel{display:none}
+.toggle-panel.active{display:block}
+.chaos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ci{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.ci.bad{border-color:#e5bfb3}
+.ci.good{border-color:var(--green)}
+.ci-icon{font-size:1rem;margin-bottom:6px}
+.ci-title{font-size:.86rem;font-weight:700;margin-bottom:3px}
+.ci-desc{font-size:.78rem;color:var(--mid);line-height:1.4}
+
+/* why now */
+.wn-wrap{margin-top:36px;position:relative;padding-top:52px}
+.wn-line{position:absolute;top:20px;left:20px;right:0;height:1px;background:var(--border)}
+.wn-fill{position:absolute;top:0;left:0;height:100%;background:var(--green);width:0;transition:width 1.4s cubic-bezier(.4,0,.2,1)}
+.wn-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.wn-item{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease;position:relative;padding-right:8px}
+.wn-item.vis{opacity:1;transform:translateY(0)}
+.wn-dot{width:38px;height:38px;border-radius:50%;background:var(--card);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;position:absolute;top:-42px;left:0;transition:all .4s ease}
+.wn-item.vis .wn-dot{background:var(--green);border-color:var(--green);color:var(--dark)}
+.wn-yr{font-size:.72rem;font-weight:700;color:var(--light);margin-bottom:7px}
+.wn-sig{font-size:.86rem;font-weight:700;margin-bottom:4px;line-height:1.3}
+.wn-desc{font-size:.76rem;color:var(--mid);line-height:1.4}
+
+/* step reveal */
+.step-reveal{display:flex;flex-direction:column;gap:0;margin-top:28px}
+.step-row{display:flex;align-items:stretch;gap:0;opacity:0;transform:translateX(-10px);transition:opacity .4s ease,transform .4s ease}
+.step-row.vis{opacity:1;transform:translateX(0)}
+.step-line{display:flex;flex-direction:column;align-items:center;width:38px;flex-shrink:0}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;transition:all .3s}
+.step-row.vis .step-num{background:var(--dark);color:#fff;border-color:var(--dark)}
+.step-row.hl .step-num{background:var(--green);color:var(--dark);border-color:var(--green)}
+.step-conn{width:1px;background:var(--border);flex:1;margin:3px 0}
+.step-body{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 16px;flex:1;margin-bottom:8px;margin-left:12px;transition:border-color .3s,background .3s}
+.step-row.hl .step-body{border-color:var(--green);background:var(--bg)}
+.step-name{font-size:.9rem;font-weight:700;margin-bottom:2px}
+.step-detail{font-size:.78rem;color:var(--mid);line-height:1.4}
+
+/* comp map */
+.comp-map{position:relative;margin-top:28px;width:100%;height:320px;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.axis{position:absolute;background:var(--border)}
+.axis.h{height:1px;left:5%;right:5%;top:50%}
+.axis.v{width:1px;top:5%;bottom:5%;left:50%}
+.ax-lbl{position:absolute;font-size:.7rem;font-weight:600;color:var(--light);letter-spacing:.06em;text-transform:uppercase}
+.cdot{position:absolute;border-radius:50%;transform:translate(-50%,-50%);opacity:0;transition:all .5s ease;cursor:default}
+.cdot.vis{opacity:1}
+.cdot.rival{width:9px;height:9px;background:var(--border);border:2px solid var(--mid)}
+.cdot.cops{width:16px;height:16px;background:var(--green);border:2px solid var(--dark);box-shadow:0 0 0 5px rgba(170,238,68,.2)}
+.ctip{position:absolute;background:var(--dark);color:#fff;font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:5px;white-space:nowrap;transform:translate(-50%,-140%);opacity:0;transition:opacity .2s;pointer-events:none}
+.cdot:hover .ctip{opacity:1}
+
+/* cards */
+.cards-row{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;flex:1;min-width:160px}
+.card-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--light);margin-bottom:9px}
+.card-big{font-size:1.9rem;font-weight:800;line-height:1.1;margin-bottom:5px}
+.card-desc{font-size:.8rem;color:var(--mid);line-height:1.4}
+
+/* venn / solução */
+.venn{position:relative;max-width:780px;width:100%;height:440px;margin:24px auto 0}
+.venn-circle{position:absolute;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px;opacity:0;transition:opacity .55s ease;will-change:transform}
+.venn.vis .venn-circle{opacity:1}
+.venn-side{width:210px;height:210px;background:var(--card);border:1.5px solid var(--border);top:70px}
+.venn-left{left:calc(50% - 285px);transition-delay:.05s}
+.venn-right{left:calc(50% + 75px);transition-delay:.25s}
+.venn-center{width:256px;height:256px;left:calc(50% - 128px);top:24px;background:var(--green);border:2px solid var(--dark);z-index:3;box-shadow:0 14px 40px rgba(170,238,68,.45);transition-delay:.15s}
+.venn-ttl{font-size:.95rem;font-weight:800;line-height:1.15;margin-bottom:10px}
+.venn-center .venn-ttl{font-size:1.4rem;letter-spacing:-.01em}
+.venn-li{font-size:.78rem;color:var(--mid);line-height:1.7}
+.venn-center .venn-li{color:rgba(0,0,0,.7);font-weight:600}
+.venn-side .venn-ttl{color:var(--dark)}
+.venn-tag{position:absolute;font-size:.72rem;font-weight:700;color:var(--light);text-align:center;width:160px;transform:translateX(-50%)}
+.venn-tag.tg-c{color:var(--dark);font-weight:800}
+.venn-axis{position:relative;max-width:780px;width:100%;margin:14px auto 0;padding-top:18px}
+.venn-bar{position:relative;height:2px;background:var(--dark);margin:0 4px}
+.venn-bar::before,.venn-bar::after{content:'';position:absolute;top:50%;width:0;height:0;border-top:5px solid transparent;border-bottom:5px solid transparent;transform:translateY(-50%)}
+.venn-bar::before{left:-1px;border-right:8px solid var(--dark)}
+.venn-bar::after{right:-1px;border-left:8px solid var(--dark)}
+.venn-ends{display:flex;justify-content:space-between;margin-top:10px}
+.venn-end{max-width:200px}
+.venn-end.r{text-align:right}
+.venn-end b{font-size:1rem;font-weight:800;display:block}
+.venn-end span{font-size:.76rem;color:var(--mid);line-height:1.35}
+.venn-note{margin-top:14px;text-align:right;font-size:.72rem;color:var(--light);line-height:1.4;max-width:340px;margin-left:auto}
+.venn-note b{color:var(--dark)}
+
+/* tam bars */
+.tam-rows{display:flex;flex-direction:column;gap:10px;margin-top:26px}
+.tam-row{position:relative;background:var(--card);border:1px solid var(--border);border-radius:12px;min-height:62px;display:flex;align-items:center;overflow:hidden;opacity:0;transform:translateY(12px);transition:opacity .5s ease,transform .5s ease}
+.tam-row.vis{opacity:1;transform:translateY(0)}
+.tam-fill{position:absolute;left:0;top:0;bottom:0;background:var(--green);width:0;transition:width 1s cubic-bezier(.4,0,.2,1) .15s}
+.tam-content{position:relative;z-index:1;display:flex;align-items:center;width:100%;padding:0 16px;gap:11px}
+.tam-tag{font-size:.66rem;font-weight:800;letter-spacing:.08em;background:var(--dark);color:var(--bg);padding:3px 8px;border-radius:6px;flex-shrink:0}
+.tam-text{flex:1;min-width:0}
+.tam-name{font-size:.82rem;font-weight:700;line-height:1.25}
+.tam-sub{font-size:.71rem;color:var(--mid);margin-top:1px;line-height:1.3}
+.tam-pct{font-size:.64rem;font-weight:700;background:rgba(26,26,26,.07);border:1px solid var(--border);color:var(--dark);padding:3px 9px;border-radius:20px;flex-shrink:0;white-space:nowrap}
+.tam-pct.base{background:var(--dark);color:var(--bg);border-color:var(--dark)}
+.tam-val{font-size:1.05rem;font-weight:800;flex-shrink:0;white-space:nowrap}
+.tam-cap{font-size:.7rem;color:var(--light);margin-top:14px;display:flex;align-items:center;gap:7px}
+.tam-cap i{width:18px;height:8px;border-radius:3px;background:var(--green);display:inline-block;flex-shrink:0}
+
+/* pricing */
+.pricing-compare{display:flex;gap:12px;margin-top:24px}
+.pricing-col{flex:1;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.pricing-col.main{border:2px solid var(--dark)}
+.p-role{font-size:.78rem;color:var(--mid);margin-bottom:3px}
+.p-cost{font-size:1.15rem;font-weight:800;margin-bottom:12px}
+.p-total{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+
+/* use bars */
+.use-bars{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.ub-row{display:flex;align-items:center;gap:10px}
+.ub-lbl{font-size:.8rem;font-weight:600;width:148px;flex-shrink:0}
+.ub-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.ub-fill{height:100%;border-radius:3px;background:var(--green)}
+.ub-pct{font-size:.76rem;color:var(--light);width:60px;text-align:right;flex-shrink:0}
+
+/* team */
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
+.team-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px}
+.t-name{font-size:.92rem;font-weight:700;margin-bottom:3px}
+.t-role{font-size:.72rem;color:var(--light);margin-bottom:7px;letter-spacing:.05em;text-transform:uppercase}
+.t-desc{font-size:.8rem;color:var(--mid);line-height:1.5}
+
+/* compare */
+.cmp-row{display:flex;gap:12px;margin-top:24px}
+.cmp-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;flex:1}
+.cmp-card.hl{border:2px solid var(--dark);background:var(--bg)}
+.cmp-who{font-size:.75rem;color:var(--light);margin-bottom:9px}
+
+/* nav dots */
+.nav-map{position:fixed;left:0;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;padding:10px 0 10px 18px;z-index:100}
+.nav-track{position:absolute;left:21px;top:24px;bottom:24px;width:2px;background:var(--border);border-radius:2px;z-index:1}
+.nav-track-fill{position:absolute;left:0;top:0;width:100%;height:0;background:var(--green);border-radius:2px;transition:height .45s cubic-bezier(.4,0,.2,1)}
+.nav-item{position:relative;display:flex;align-items:center;gap:11px;height:28px;cursor:pointer}
+.nav-item .nd{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;position:relative;z-index:2;transition:all .25s;box-shadow:0 0 0 4px var(--bg)}
+.nav-item .nl{font-size:.72rem;font-weight:600;color:var(--mid);white-space:nowrap;background:var(--card);border:1px solid var(--border);padding:3px 10px;border-radius:20px;opacity:0;transform:translateX(-8px);transition:opacity .2s,transform .2s;pointer-events:none}
+.nav-item:hover .nd{background:var(--mid);transform:scale(1.35)}
+.nav-item:hover .nl{opacity:1;transform:translateX(0)}
+.nav-item.active .nd{background:var(--green);transform:scale(1.5);box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--border)}
+.nav-item.active .nl{background:var(--dark);color:#fff;border-color:var(--dark)}
+
+/* panel */
+.panel{width:42%;height:100vh;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.ph{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ph-ctx{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--light)}
+.ph-logo{font-size:.88rem;font-weight:800}
+.pb{flex:1;overflow-y:auto;padding:22px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;display:flex;flex-direction:column;gap:14px}
+.ps{display:none;flex-direction:column;gap:12px;animation:fu .3s ease}
+.ps.active{display:flex}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* panel cards */
+.pc{background:var(--pc);border:1px solid var(--border);border-radius:12px;padding:16px}
+.pl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--light);margin-bottom:7px}
+.pb2{font-size:1.85rem;font-weight:800;line-height:1;margin-bottom:3px}
+.ps2{font-size:.78rem;color:var(--mid);line-height:1.4}
+.pr{display:flex;gap:10px}
+.pr .pc{flex:1}
+
+/* cost simulator */
+.cs-region{display:flex;align-items:center;gap:8px;margin-top:11px;font-size:.74rem;color:var(--mid)}
+.cs-region span{flex-shrink:0;font-weight:600}
+.cs-region select{flex:1;font-family:inherit;font-size:.76rem;font-weight:600;color:var(--dark);background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:6px 8px;cursor:pointer;outline:none}
+.cs-card{padding:12px 14px}
+.cs-head{display:flex;align-items:center;gap:7px;padding-bottom:8px;margin-bottom:4px;border-bottom:1px solid var(--border);font-size:.6rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--light)}
+.cs-h-name{flex:1}
+.cs-h-lv{width:78px;text-align:center;flex-shrink:0}
+.cs-h-hrs{width:38px;text-align:center;flex-shrink:0}
+.cs-h-sub{width:74px;text-align:right;flex-shrink:0}
+.cs-row{display:flex;align-items:center;gap:7px;padding:7px 0;border-bottom:1px solid rgba(208,204,195,.5);cursor:pointer;transition:opacity .2s}
+.cs-row:last-child{border-bottom:none}
+.cs-row.off{opacity:.45}
+.cs-cb{width:15px;height:15px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--bg);transition:all .15s}
+.cs-row.on .cs-cb,.cs-saas.on .cs-cb{background:var(--green);border-color:var(--dark)}
+.cs-cb svg{width:9px;height:9px;opacity:0}
+.cs-row.on .cs-cb svg,.cs-saas.on .cs-cb svg{opacity:1}
+.cs-name{flex:1;font-size:.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs-lv{display:flex;gap:3px;width:78px;flex-shrink:0}
+.cs-lvb{flex:1;font-size:.6rem;font-weight:700;text-align:center;padding:4px 0;border-radius:5px;background:var(--bg);border:1px solid var(--border);color:var(--light);cursor:pointer;transition:all .15s}
+.cs-lvb.on{background:var(--dark);color:#fff;border-color:var(--dark)}
+.cs-hrs{width:38px;flex-shrink:0;font-family:inherit;font-size:.72rem;font-weight:700;text-align:center;color:var(--dark);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 2px;outline:none}
+.cs-hrs:focus{border-color:var(--dark)}
+.cs-sub{width:74px;text-align:right;flex-shrink:0;font-size:.76rem;font-weight:700;color:var(--dark)}
+.cs-row.off .cs-sub{color:var(--light)}
+.cs-saas{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(208,204,195,.5);cursor:pointer;transition:opacity .2s}
+.cs-saas:last-child{border-bottom:none}
+.cs-saas.off{opacity:.45}
+.cs-saas .cs-name{font-weight:600}
+.cs-saas-v{font-size:.76rem;font-weight:700;flex-shrink:0}
+
+/* sliders */
+.sg{margin-top:4px}
+.st{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.sn{font-size:.84rem;font-weight:600}
+.sv{font-size:.92rem;font-weight:800}
+input[type=range]{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:var(--border);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--dark);cursor:pointer;transition:transform .15s}
+input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
+
+.rh{background:var(--green);border-radius:10px;padding:13px 16px;display:flex;justify-content:space-between;align-items:center}
+.rh-l{font-size:.75rem;font-weight:600;color:rgba(0,0,0,.5)}
+.rh-v{font-size:1.35rem;font-weight:800;color:var(--dark)}
+
+.mb{margin-top:4px;display:flex;flex-direction:column;gap:6px}
+.mb-row{display:flex;align-items:center;gap:7px;font-size:.78rem}
+.mb-n{width:110px;flex-shrink:0;color:var(--mid)}
+.mb-t{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.mb-f{height:100%;border-radius:2px;background:var(--dark)}
+.mb-f.g{background:var(--green)}
+.mb-v{width:52px;text-align:right;font-weight:700;flex-shrink:0}
+
+/* runway */
+.rw-chart{display:flex;align-items:flex-end;gap:3px;height:68px;margin-top:10px}
+.rw-bar{flex:1;border-radius:3px 3px 0 0;min-height:3px}
+.rw-bar.a{background:var(--green)}
+.rw-bar.s{background:var(--border)}
+.rw-bar.b{background:var(--dark)}
+.rw-lbls{display:flex;gap:3px;margin-top:3px}
+.rw-lbl{flex:1;font-size:.6rem;color:var(--light);text-align:center}
+
+/* footer */
+.pf{border-top:1px solid var(--border);padding:11px 22px;display:flex;flex-shrink:0}
+.mp{flex:1;text-align:center;font-size:.7rem}
+.mp+.mp{border-left:1px solid var(--border)}
+.mp .mv{font-size:.9rem;font-weight:800;display:block;margin-bottom:1px}
+.mp .ml{color:var(--light)}
+
+/* progress */
+.progress{position:fixed;top:0;left:0;height:2px;background:var(--green);z-index:200;transition:width .1s linear}
+
+/* countup */
+.cu{display:inline}
+</style>
+</head>
+<body>
+
+<div class="progress" id="prog"></div>
+<div class="nav-map" id="navDots"></div>
+
+<div class="narrative" id="narrative">
+
+<!-- 0: HERO -->
+<section class="section" data-section="0" data-panel="overview">
+<div class="sc">
+  <div class="lbl">COps · Mai 2026</div>
+  <div class="hero-story" id="heroStory"></div>
+  <div class="hero-reveal" id="heroReveal">
+    <h1>A camada<br><span class="em">operacional</span><br>da criação.</h1>
+    <div class="chip-row">
+      <div class="chip solid">R$10k/mês · Plano Único</div>
+      <div class="chip outline">Captando R$100k · 9–17% equity</div>
+      <div class="chip outline">MRR atual R$11,3k</div>
+    </div>
+    <p style="margin-top:22px;font-size:.8rem;color:var(--light)">↓ Role a narrativa · simule cenários no painel →</p>
+  </div>
+</div>
+</section>
+
+<!-- 1: PROBLEMA -->
+<section class="section" data-section="1" data-panel="custo">
+<div class="sc">
+  <div class="lbl">O Problema</div>
+  <h2>A operação criativa<br>está <span class="em">quebrando</span> em escala.</h2>
+  <div class="toggle-wrap">
+    <div class="toggle-tabs">
+      <div class="toggle-tab active" data-target="sem-cops">Sem operação criativa</div>
+      <div class="toggle-tab" data-target="com-cops">Com COps</div>
+    </div>
+    <div class="toggle-panel active" id="sem-cops">
+      <div class="chaos-grid">
+        <div class="ci bad"><div class="ci-icon">🔥</div><div class="ci-title"><span class="cu" data-to="44" data-sfx="%">0%</span> em burnout</div><div class="ci-desc">Equipes fragmentadas — todo mundo pede, ninguém prioriza</div></div>
+        <div class="ci bad"><div class="ci-icon">💸</div><div class="ci-title">1,78× mais custo</div><div class="ci-desc">Marcas inconsistentes pagam mais caro por aquisição</div></div>
+        <div class="ci bad"><div class="ci-icon">📋</div><div class="ci-title"><span class="cu" data-to="59" data-sfx="%">0%</span> dos CMOs</div><div class="ci-desc">Sem recursos pra executar a estratégia que definiram</div></div>
+        <div class="ci bad"><div class="ci-icon">📉</div><div class="ci-title">R$30–48k/mês</div><div class="ci-desc">Custo de time sem sistema — dinheiro sem rastreabilidade</div></div>
+      </div>
+    </div>
+    <div class="toggle-panel" id="com-cops">
+      <div class="chaos-grid">
+        <div class="ci good"><div class="ci-icon">✅</div><div class="ci-title">Triagem obrigatória</div><div class="ci-desc">Nada entra na fila sem Definition of Ready</div></div>
+        <div class="ci good"><div class="ci-icon">📊</div><div class="ci-title">Backlog visível</div><div class="ci-desc">Status, responsável e prazo em tempo real</div></div>
+        <div class="ci good"><div class="ci-icon">⚡</div><div class="ci-title">SLA por tipo</div><div class="ci-desc">Cada entrega tem tempo contratado — sem surpresa</div></div>
+        <div class="ci good"><div class="ci-icon">📈</div><div class="ci-title">R$10k/mês fixo</div><div class="ci-desc">Output multidisciplinar com custo previsível</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 2: SOLUÇÃO -->
+<section class="section" data-section="2" data-panel="solucao">
+<div class="sc">
+  <div class="lbl">A Solução</div>
+  <h2>Falta a <span class="em">camada do meio</span>.</h2>
+  <p>Toda operação criativa tem conceitual e produção. A maioria das empresas tem os dois. O que falta é a camada viva entre eles.</p>
+  <div class="venn" id="venn">
+    <div class="venn-circle venn-side venn-left">
+      <div class="venn-ttl">Conceitual</div>
+      <div class="venn-li">Brandbook<br>Identidade visual<br>Guidelines</div>
+    </div>
+    <div class="venn-circle venn-side venn-right">
+      <div class="venn-ttl">Produção</div>
+      <div class="venn-li">Volume<br>Entregas<br>Execução</div>
+    </div>
+    <div class="venn-circle venn-center">
+      <div class="venn-ttl">Creativity<br>Operations</div>
+      <div class="venn-li">Sistema de produção<br>Consciência em escala<br>Aprendizado contínuo</div>
+    </div>
+    <div class="venn-tag" style="left:calc(50% - 180px);top:296px">estático</div>
+    <div class="venn-tag tg-c" style="left:50%;top:296px">Vivo &amp; sustentável</div>
+    <div class="venn-tag" style="left:calc(50% + 180px);top:296px">estático</div>
+  </div>
+  <div class="venn-axis">
+    <div class="venn-bar"></div>
+    <div class="venn-ends">
+      <div class="venn-end"><b>Arte</b><span>bonito, mas não vende</span></div>
+      <div class="venn-end r"><b>Commodity</b><span>volume sem diferenciação</span></div>
+    </div>
+    <div class="venn-note"><b>Plus:</b> o boom de IA e o mau uso de ferramentas de inovação empurram as marcas pros dois extremos — e reforçam ainda mais a necessidade da camada do meio.</div>
+  </div>
+</div>
+</section>
+
+<!-- 3: WHY NOW -->
+<section class="section" data-section="3" data-panel="whynow" id="sec-wn">
+<div class="sc">
+  <div class="lbl">Por que agora</div>
+  <h2>Quatro forças<br>convergindo em <span class="em">2026</span>.</h2>
+  <p>O mercado não criou espaço pro COps por acidente — quatro movimentos simultâneos tornaram esse produto inevitável.</p>
+  <div class="wn-wrap" id="wnWrap">
+    <div class="wn-line"><div class="wn-fill" id="wnFill"></div></div>
+    <div class="wn-grid">
+      <div class="wn-item" data-d="0"><div class="wn-dot">1</div><div class="wn-yr">2019–2022</div><div class="wn-sig">IA tornou a produção commodity</div><div class="wn-desc">Ferramentas de geração explodiram. Volume ficou fácil. Diferenciação ficou impossível sem sistema.</div></div>
+      <div class="wn-item" data-d="160"><div class="wn-dot">2</div><div class="wn-yr">2022–2024</div><div class="wn-sig">In-housing explode</div><div class="wn-desc">82% das marcas trouxeram criação pra dentro. Sem operação, virou caos interno.</div></div>
+      <div class="wn-item" data-d="320"><div class="wn-dot">3</div><div class="wn-yr">2024</div><div class="wn-sig">Mercado valida o modelo</div><div class="wn-desc">Accenture compra Whalar por $300M. Operação criativa recorrente vira ativo de bilhões.</div></div>
+      <div class="wn-item" data-d="480"><div class="wn-dot">4</div><div class="wn-yr">2026 →</div><div class="wn-sig">A janela está aberta</div><div class="wn-desc">60% cortaram agência. 120k fractional CMOs. Mid-market BR sem solução. COps chega.</div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 4: PRODUTO -->
+<section class="section" data-section="4" data-panel="produto" id="sec-prod">
+<div class="sc">
+  <div class="lbl">O Produto</div>
+  <h2>Seis etapas.<br><span class="em">Um ciclo que aprende.</span></h2>
+  <div class="step-reveal" id="stepReveal">
+    <div class="step-row" data-i="0"><div class="step-line"><div class="step-num">1</div><div class="step-conn"></div></div><div class="step-body"><div class="step-name">Diagnóstico</div><div class="step-detail">Mapeamento da operação criativa atual — o que existe, o que falta, o que trava</div></div></div>
+    <div class="step-row" data-i="1"><div class="step-line"><div class="step-num">2</div><div class="step-conn"></div></div><div class="step-body"><div class="step-name">Entrada</div><div class="step-detail">Definition of Ready obrigatório antes de entrar na fila — zero demanda vaga</div></div></div>
+    <div class="step-row" data-i="2"><div class="step-line"><div class="step-num">3</div><div class="step-conn"></div></div><div class="step-body"><div class="step-name">Triagem</div><div class="step-detail">WIP limitado · Backlog visível · Fast lane pra urgência real</div></div></div>
+    <div class="step-row hl" data-i="3"><div class="step-line"><div class="step-num">4</div><div class="step-conn"></div></div><div class="step-body"><div class="step-name">Produção</div><div class="step-detail">SLA por tipo de entrega · Rodadas de revisão limitadas · Padrão garantido</div></div></div>
+    <div class="step-row" data-i="4"><div class="step-line"><div class="step-num">5</div><div class="step-conn"></div></div><div class="step-body"><div class="step-name">Revisão</div><div class="step-detail">Janela de resposta definida em contrato — sem loop infinito de ajuste</div></div></div>
+    <div class="step-row" data-i="5"><div class="step-line"><div class="step-num">6</div></div><div class="step-body"><div class="step-name">Entrega</div><div class="step-detail">Dados do ciclo alimentam o próximo — operação que aprende com o cliente</div></div></div>
+  </div>
+</div>
+</section>
+
+<!-- 5: COMPETITIVE MAP -->
+<section class="section" data-section="5" data-panel="diferencial" id="sec-comp">
+<div class="sc">
+  <div class="lbl">Posicionamento</div>
+  <h2>COps já existe <span class="em">antes</span> do briefing.</h2>
+  <p>Nenhum concorrente opera no quadrante proativo + direção. Plataformas são ferramentas. COps é uma camada de decisão.</p>
+  <div class="comp-map">
+    <div class="axis h"></div><div class="axis v"></div>
+    <div class="ax-lbl" style="top:47%;left:6%">Reativo</div>
+    <div class="ax-lbl" style="top:47%;right:4%">Proativo</div>
+    <div class="ax-lbl" style="top:5%;left:50%;transform:translateX(-50%)">Direção</div>
+    <div class="ax-lbl" style="bottom:5%;left:50%;transform:translateX(-50%)">Execução</div>
+    <div class="cdot rival" style="left:18%;top:72%"><div class="ctip">Freelancers</div></div>
+    <div class="cdot rival" style="left:26%;top:62%"><div class="ctip">Faster / Plataformas</div></div>
+    <div class="cdot rival" style="left:20%;top:28%"><div class="ctip">Agência tradicional</div></div>
+    <div class="cdot rival" style="left:52%;top:65%"><div class="ctip">Design subscription</div></div>
+    <div class="cdot cops" style="left:80%;top:22%"><div class="ctip">COps ✓</div></div>
+  </div>
+</div>
+</section>
+
+<!-- 6: MERCADO -->
+<section class="section" data-section="6" data-panel="mercado">
+<div class="sc">
+  <div class="lbl">Sinais de Mercado</div>
+  <h2>O mercado criativo está sendo <span class="em">reconfigurado</span>.</h2>
+  <div class="cards-row">
+    <div class="card"><div class="card-lbl">Aquisição</div><div class="card-big">$300M</div><div class="card-desc">Accenture adquire Whalar — operações criativas recorrentes valem bilhões</div></div>
+    <div class="card"><div class="card-lbl">Sinal de Mercado</div><div class="card-big"><span class="cu" data-to="60" data-sfx="%">0%</span></div><div class="card-desc">das marcas cortaram agência externa</div></div>
+  </div>
+  <div class="cards-row">
+    <div class="card"><div class="card-lbl">Comportamento</div><div class="card-big">33k</div><div class="card-desc">marcas: diferencial é máquina criativa, não tática de mídia</div></div>
+    <div class="card"><div class="card-lbl">Demanda</div><div class="card-big"><span class="cu" data-to="120" data-sfx="k">0k</span></div><div class="card-desc">fractional CMOs — demanda dobrou</div></div>
+  </div>
+</div>
+</section>
+
+<!-- 7: TIME -->
+<section class="section" data-section="7" data-panel="time">
+<div class="sc">
+  <div class="lbl">Time</div>
+  <h2>Os dois lados<br><span class="em">do loop</span>.</h2>
+  <div class="team-grid">
+    <div class="team-card" style="border:2px solid var(--dark)"><div class="t-name">Gabriel Gomes</div><div class="t-role">Direção · Inovação · Sistema</div><div class="t-desc">Responsável pela camada operacional inteira. Único ponto de decisão criativa e comercial.</div></div>
+    <div class="team-card"><div class="t-name">João Villela</div><div class="t-role">Execução Criativa</div><div class="t-desc">Cobre a camada de produção dentro do sistema que Gabriel gerencia.</div></div>
+    <div class="team-card"><div class="t-name">Guilherme Alves</div><div class="t-role">Marketing · Aquisição</div><div class="t-desc">Canal LinkedIn + bonificação por fechamento.</div></div>
+    <div class="team-card"><div class="t-name">Mateus Molinar</div><div class="t-role">Finance · Innovation</div><div class="t-desc">Estrutura financeira e IA como alavanca de margem.</div></div>
+  </div>
+  <div style="margin-top:16px;padding:13px 16px;background:var(--card);border-radius:10px;border:1px solid var(--border)">
+    <p style="font-size:.84rem">6 anos diagnosticando o mesmo problema. Em 1 semana após sair da Bring IT, o C-staff chamou de volta. Esse foi o primeiro contrato.</p>
+  </div>
+</div>
+</section>
+
+<!-- 8: TAM/SAM/SOM -->
+<section class="section" data-section="8" data-panel="tam">
+<div class="sc">
+  <div class="lbl">Mercado Endereçável</div>
+  <h2>O mercado está migrando pro modelo que o COps <span class="em">opera</span>.</h2>
+  <div class="tam-rows" id="tamRows">
+    <div class="tam-row">
+      <div class="tam-fill" data-w="0"></div>
+      <div class="tam-content">
+        <div class="tam-tag">TAM</div>
+        <div class="tam-text"><div class="tam-name">Marketing Ops Management · global</div><div class="tam-sub">72–76% é software (Oracle, SAP, Adobe) · não é onde COps joga</div></div>
+        <div class="tam-pct base">mercado total</div>
+        <div class="tam-val">US$2,06B</div>
+      </div>
+    </div>
+    <div class="tam-row">
+      <div class="tam-fill" data-w="26"></div>
+      <div class="tam-content">
+        <div class="tam-tag">TAM</div>
+        <div class="tam-text"><div class="tam-name">Fatia de serviços · entrega humana</div><div class="tam-sub">onde a execução humana ganha do software</div></div>
+        <div class="tam-pct">26% do total</div>
+        <div class="tam-val">US$490–580M</div>
+      </div>
+    </div>
+    <div class="tam-row">
+      <div class="tam-fill" data-w="9"></div>
+      <div class="tam-content">
+        <div class="tam-tag">SAM</div>
+        <div class="tam-text"><div class="tam-name">Mid-market BR · demanda criativa recorrente</div></div>
+        <div class="tam-pct">~34% do TAM serviços</div>
+        <div class="tam-val">R$0,6–1,3B/ano</div>
+      </div>
+    </div>
+    <div class="tam-row">
+      <div class="tam-fill" data-w="4"></div>
+      <div class="tam-content">
+        <div class="tam-tag">SOM</div>
+        <div class="tam-text"><div class="tam-name">12–20 clientes × R$120k/ano · 18–24 meses</div></div>
+        <div class="tam-pct">~0,2% do SAM</div>
+        <div class="tam-val">R$1,44–2,4M ARR</div>
+      </div>
+    </div>
+  </div>
+  <div class="tam-cap"><i></i> Barra verde = fatia do mercado total (US$2,06B) · pílula = quanto cada nível representa do nível acima</div>
+</div>
+</section>
+
+<!-- 9: PRICING -->
+<section class="section" data-section="9" data-panel="receita">
+<div class="sc">
+  <div class="lbl">Modelo de Receita</div>
+  <h2>Assinatura mensal.<br><span class="em">Mínimo 3 meses.</span></h2>
+  <div class="pricing-compare">
+    <div class="pricing-col">
+      <div class="card-lbl">Time interno</div>
+      <div style="margin-top:10px">
+        <div class="p-role">Brand Designer</div><div class="p-cost">R$8–12k/mês</div>
+        <div class="p-role">UI/UX Designer</div><div class="p-cost">R$5–8k/mês</div>
+        <div class="p-role">Motion Designer</div><div class="p-cost">R$4–9k/mês</div>
+        <div class="p-role">Creative Direction</div><div class="p-cost">R$12–18k/mês</div>
+        <div class="p-role">Ferramentas</div><div class="p-cost">~R$3,8k/mês</div>
+        <div class="p-total"><div class="p-role">Total</div><div style="font-size:1.45rem;font-weight:800">R$60–96k/mês</div></div>
+      </div>
+    </div>
+    <div class="pricing-col main">
+      <div class="card-lbl">Plano Único COps</div>
+      <div style="font-size:2.7rem;font-weight:800;margin:12px 0">R$10k<span style="font-size:.95rem;font-weight:400">/mês</span></div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="padding:7px 0;border-top:1px solid var(--border);font-size:.84rem">Direção criativa contínua</div>
+        <div style="padding:7px 0;border-top:1px solid var(--border);font-size:.84rem">Triagem e priorização</div>
+        <div style="padding:7px 0;border-top:1px solid var(--border);font-size:.84rem">Governança + SLA</div>
+        <div style="padding:7px 0;border-top:1px solid var(--border);font-size:.84rem">Backlog visível em tempo real</div>
+      </div>
+      <div style="margin-top:14px;background:var(--green);border-radius:8px;padding:9px 12px;font-size:.8rem;font-weight:600">Output multidisciplinar pelo custo de um designer pleno</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 10: CAPTAÇÃO -->
+<section class="section" data-section="10" data-panel="investimento">
+<div class="sc">
+  <div class="lbl">Captação</div>
+  <h2>Capital pra <span class="em">destravar</span> o próximo milestone.</h2>
+  <div style="margin:22px 0">
+    <div style="font-size:3.6rem;font-weight:800">R$100k</div>
+    <p style="margin-top:7px">O produto está validado e o primeiro contrato roda. O capital contrata a camada de execução e transforma 1 cliente em operação escalável.</p>
+    <div style="margin-top:10px;display:inline-block;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:.86rem">Operação atual: <strong>R$11.320 MRR</strong></div>
+  </div>
+  <div class="use-bars">
+    <div class="ub-row"><div class="ub-lbl">Execução criativa</div><div class="ub-track"><div class="ub-fill" style="width:60%"></div></div><div class="ub-pct">60% · R$60k</div></div>
+    <div class="ub-row"><div class="ub-lbl">Prospecção e growth</div><div class="ub-track"><div class="ub-fill" style="width:24%"></div></div><div class="ub-pct">24% · R$24k</div></div>
+    <div class="ub-row"><div class="ub-lbl">Capital de giro</div><div class="ub-track"><div class="ub-fill" style="width:10%"></div></div><div class="ub-pct">10% · R$10k</div></div>
+    <div class="ub-row"><div class="ub-lbl">Infraestrutura</div><div class="ub-track"><div class="ub-fill" style="width:6%"></div></div><div class="ub-pct">6% · R$6k</div></div>
+  </div>
+</div>
+</section>
+
+</div><!-- /narrative -->
+
+<!-- PANEL -->
+<div class="panel">
+<div class="ph"><div class="ph-logo">COps</div><div class="ph-ctx" id="pCtx">Visão Geral</div></div>
+<div class="pb" id="panelBody">
+
+<!-- overview -->
+<div class="ps active" id="state-overview">
+  <div class="pc"><div class="pl">O que é COps</div><p style="font-size:.86rem;line-height:1.6;color:var(--mid)">Operação criativa recorrente como produto. Não é agência, não é freelancer, não é plataforma. É a camada de governança que faltava entre estratégia e produção.</p></div>
+  <div class="pr"><div class="pc"><div class="pl">MRR Atual</div><div class="pb2">R$11,3k</div><div class="ps2">1 contrato ativo</div></div><div class="pc"><div class="pl">Ticket Base</div><div class="pb2">R$10k</div><div class="ps2">Mínimo 3 meses</div></div></div>
+  <div class="pc" style="background:var(--green)"><div class="pl" style="color:rgba(0,0,0,.45)">Captando</div><div class="pb2">R$100k</div><div class="ps2" style="color:rgba(0,0,0,.55)">Valuation pré R$0,5–1M · Diluição 9–17%</div></div>
+  <div class="pc"><div class="pl">Validação</div><div class="mb">
+    <div class="mb-row"><span class="mb-n">Problema</span><div class="mb-t"><div class="mb-f g" style="width:100%"></div></div><span class="mb-v">validado</span></div>
+    <div class="mb-row"><span class="mb-n">Produto</span><div class="mb-t"><div class="mb-f g" style="width:100%"></div></div><span class="mb-v">rodando</span></div>
+    <div class="mb-row"><span class="mb-n">1º contrato</span><div class="mb-t"><div class="mb-f g" style="width:100%"></div></div><span class="mb-v">fechado</span></div>
+    <div class="mb-row"><span class="mb-n">Escala</span><div class="mb-t"><div class="mb-f" style="width:12%"></div></div><span class="mb-v">próximo</span></div>
+  </div></div>
+</div>
+
+<!-- custo -->
+<div class="ps" id="state-custo">
+  <div class="pc"><div class="pl">Simulador de Custo Operacional</div><p style="font-size:.82rem;color:var(--mid);line-height:1.5">Monte o time que você precisaria internamente. Marque funções e licenças e compare com o COps.</p>
+    <div class="cs-region">
+      <span>Moeda / Localização</span>
+      <select id="csRegion">
+        <option value="BRL">BRL · Brasil</option>
+        <option value="USD">USD · Estados Unidos</option>
+        <option value="EUR">EUR · Europa</option>
+      </select>
+    </div>
+  </div>
+  <div class="pc cs-card">
+    <div class="cs-head"><span class="cs-h-name">Recurso humano</span><span class="cs-h-lv">Nível</span><span class="cs-h-hrs">h/mês</span><span class="cs-h-sub">Subtotal</span></div>
+    <div id="csTable"></div>
+  </div>
+  <div class="pc cs-card">
+    <div class="pl">Licenciamento SaaS <span style="color:var(--light);font-weight:600;text-transform:none;letter-spacing:0">· base USD</span></div>
+    <div id="csSaas"></div>
+  </div>
+  <div class="rh"><div><div class="rh-l">Custo in-house / mês</div><div class="rh-v" id="csInhouse">—</div></div><div style="text-align:right"><div class="rh-l">Com COps</div><div class="rh-v" id="csCops">—</div></div></div>
+  <div class="pc" style="background:var(--dark)"><div class="pl" style="color:var(--light)">Economia anual projetada</div><div class="pb2" id="csSave" style="color:var(--green)">—</div><div class="ps2" style="color:var(--light)" id="csSaveSub">vs montar e manter o time internamente</div></div>
+</div>
+
+<!-- solucao -->
+<div class="ps" id="state-solucao">
+  <div class="pc"><div class="pl">Por que a camada do meio importa</div><p style="font-size:.84rem;color:var(--mid);line-height:1.6">Sem ela, o conceitual não se traduz em execução. A produção entrega volume sem diferenciação. O briefing chega mal formado ou não chega.</p></div>
+  <div class="pc"><div class="pl">O que COps garante</div><div class="mb" style="margin-top:6px">
+    <div class="mb-row"><span class="mb-n">Governança</span><div class="mb-t"><div class="mb-f g" style="width:100%"></div></div></div>
+    <div class="mb-row"><span class="mb-n">SLA definido</span><div class="mb-t"><div class="mb-f g" style="width:100%"></div></div></div>
+    <div class="mb-row"><span class="mb-n">Priorização</span><div class="mb-t"><div class="mb-f g" style="width:100%"></div></div></div>
+    <div class="mb-row"><span class="mb-n">Aprendizado</span><div class="mb-t"><div class="mb-f g" style="width:100%"></div></div></div>
+  </div></div>
+  <div class="pc" style="background:var(--green)"><div class="pl" style="color:rgba(0,0,0,.45)">Posicionamento</div><div style="font-size:.9rem;font-weight:700">Arte → Sistema → Commodity</div><div style="font-size:.78rem;margin-top:4px;color:rgba(0,0,0,.55)">COps garante que a marca não vire commodity sem virar arte decorativa.</div></div>
+</div>
+
+<!-- whynow -->
+<div class="ps" id="state-whynow">
+  <div class="pc"><div class="pl">A janela de oportunidade</div><p style="font-size:.84rem;color:var(--mid);line-height:1.6">Timing não é sorte — é a convergência de quatro forças que criaram o problema mas ainda não geraram a solução. COps chega primeiro.</p></div>
+  <div class="pc" style="background:var(--green)"><div class="pl" style="color:rgba(0,0,0,.45)">Sinal mais forte</div><div style="font-size:.95rem;font-weight:700">Accenture compra Whalar por $300M</div><div style="font-size:.78rem;margin-top:4px;color:rgba(0,0,0,.55)">O mercado já reconhece operação criativa como ativo de bilhões.</div></div>
+  <div class="pr"><div class="pc"><div class="pl">In-house agencies</div><div class="pb2">82%</div><div class="ps2">das marcas (ANA)</div></div><div class="pc"><div class="pl">Cortaram agência</div><div class="pb2">60%</div><div class="ps2">eMarketer 2025</div></div></div>
+  <div class="pc"><div class="pl">Por que não antes</div><p style="font-size:.82rem;color:var(--mid);line-height:1.5">A dor existia, mas o mercado tentava resolver com mais agência ou freelancer. IA escancarou que o problema é operacional, não de volume.</p></div>
+</div>
+
+<!-- produto -->
+<div class="ps" id="state-produto">
+  <div class="pc"><div class="pl">O Ciclo Operacional</div><p style="font-size:.84rem;color:var(--mid);line-height:1.6">Cada ciclo gera dados. Os dados melhoram o próximo. A operação aprende com o cliente.</p></div>
+  <div class="pc" style="background:var(--green)"><div class="pl" style="color:rgba(0,0,0,.45)">Diferencial sistêmico</div><div style="font-size:.88rem;font-weight:700">WIP limitado + SLA contratado + Rodadas limitadas</div><div style="font-size:.78rem;margin-top:4px;color:rgba(0,0,0,.55)">Três regras que a maioria das operações não tem — e que mudam tudo.</div></div>
+  <div class="pc"><div class="pl">O que cada etapa garante</div>
+    <div style="display:flex;flex-direction:column;gap:5px;margin-top:6px">
+      <div style="display:flex;gap:8px;font-size:.8rem"><span style="font-weight:700;width:76px;flex-shrink:0">Diagnóstico</span><span style="color:var(--mid)">clareza do ponto de partida</span></div>
+      <div style="display:flex;gap:8px;font-size:.8rem"><span style="font-weight:700;width:76px;flex-shrink:0">Triagem</span><span style="color:var(--mid)">zero demanda vaga na fila</span></div>
+      <div style="display:flex;gap:8px;font-size:.8rem"><span style="font-weight:700;width:76px;flex-shrink:0">Produção</span><span style="color:var(--mid)">padrão garantido por SLA</span></div>
+      <div style="display:flex;gap:8px;font-size:.8rem"><span style="font-weight:700;width:76px;flex-shrink:0">Entrega</span><span style="color:var(--mid)">dados → próximo ciclo melhor</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- diferencial -->
+<div class="ps" id="state-diferencial">
+  <div class="pc"><div class="pl">Mapa competitivo</div><p style="font-size:.84rem;color:var(--mid);line-height:1.5">Nenhum concorrente opera no quadrante proativo + direção. É onde COps vive — e ninguém mora lá ainda.</p></div>
+  <div class="pc"><div class="pl">Concorrentes</div><div style="display:flex;flex-direction:column;gap:5px;margin-top:5px">
+    <div style="display:flex;gap:7px;align-items:center;font-size:.82rem"><span style="color:var(--light)">✗</span><span>Começam com briefing pronto</span></div>
+    <div style="display:flex;gap:7px;align-items:center;font-size:.82rem"><span style="color:var(--light)">✗</span><span>Sem governança de demanda</span></div>
+    <div style="display:flex;gap:7px;align-items:center;font-size:.82rem"><span style="color:var(--light)">✗</span><span>Volume sem aprendizado</span></div>
+  </div></div>
+  <div class="pc" style="border:2px solid var(--dark)"><div class="pl">COps</div><div style="display:flex;flex-direction:column;gap:5px;margin-top:5px">
+    <div style="display:flex;gap:7px;align-items:center;font-size:.82rem"><span style="color:var(--green);font-weight:700">✓</span><span>Define o que vira briefing válido</span></div>
+    <div style="display:flex;gap:7px;align-items:center;font-size:.82rem"><span style="color:var(--green);font-weight:700">✓</span><span>Governança e SLA contratados</span></div>
+    <div style="display:flex;gap:7px;align-items:center;font-size:.82rem"><span style="color:var(--green);font-weight:700">✓</span><span>Ciclo que aprende com o cliente</span></div>
+    <div style="display:flex;gap:7px;align-items:center;font-size:.82rem"><span style="color:var(--green);font-weight:700">✓</span><span>Existe antes, durante e depois</span></div>
+  </div></div>
+</div>
+
+<!-- mercado -->
+<div class="ps" id="state-mercado">
+  <div class="pc"><div class="pl">Contexto de Mercado</div><p style="font-size:.84rem;color:var(--mid);line-height:1.6">In-housing + corte de agências criou uma lacuna exata onde COps opera.</p></div>
+  <div class="pr"><div class="pc"><div class="pl">In-house</div><div class="pb2">82%</div><div class="ps2">das marcas (ANA)</div></div><div class="pc"><div class="pl">Cortaram agência</div><div class="pb2">60%</div><div class="ps2">eMarketer 2025</div></div></div>
+  <div class="pc" style="background:var(--green)"><div class="pl" style="color:rgba(0,0,0,.45)">Sinal mais forte</div><div style="font-size:.95rem;font-weight:700">Accenture compra Whalar por $300M</div><div style="font-size:.78rem;margin-top:4px;color:rgba(0,0,0,.55)">Operações criativas recorrentes como ativo de bilhões.</div></div>
+</div>
+
+<!-- time -->
+<div class="ps" id="state-time">
+  <div class="pc"><div class="pl">6 anos de diagnóstico</div><p style="font-size:.84rem;color:var(--mid);line-height:1.6">O produto não foi idealizado numa tarde. É a síntese de 6 anos vivendo o problema dos dois lados.</p></div>
+  <div class="pc" style="background:var(--green)"><div class="pl" style="color:rgba(0,0,0,.45)">Prova de mercado</div><div style="font-size:.92rem;font-weight:700">1 semana após sair da Bring IT</div><div style="font-size:.78rem;margin-top:4px;color:rgba(0,0,0,.55)">C-staff chamou de volta. Esse foi o primeiro contrato do COps.</div></div>
+  <div class="pc"><div class="pl">Timeline</div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+      <div style="display:flex;gap:10px;font-size:.8rem"><span style="color:var(--light);width:34px;flex-shrink:0">2019</span><span style="color:var(--mid)">Agência · primeira dor operacional</span></div>
+      <div style="display:flex;gap:10px;font-size:.8rem"><span style="color:var(--light);width:34px;flex-shrink:0">2021</span><span style="color:var(--mid)">Nest · marca consistente exige operação</span></div>
+      <div style="display:flex;gap:10px;font-size:.8rem"><span style="color:var(--light);width:34px;flex-shrink:0">2025</span><span style="color:var(--mid)">Bring IT · 24 meses, dor virou sistema</span></div>
+      <div style="display:flex;gap:10px;font-size:.8rem"><span style="font-weight:700;width:34px;flex-shrink:0">2026</span><span style="font-weight:700">COps · produto nasce</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- tam -->
+<div class="ps" id="state-tam">
+  <div class="pc"><div class="pl">Simulador de Mercado</div><p style="font-size:.82rem;color:var(--mid);line-height:1.5">Ajuste as premissas e veja o impacto no SOM endereçável.</p></div>
+  <div class="pc"><div class="sg"><div class="st"><span class="sn">Clientes em 24 meses</span><span class="sv" id="v-tc">16</span></div><input type="range" min="5" max="30" value="16" id="sl-tc"></div></div>
+  <div class="pc"><div class="sg"><div class="st"><span class="sn">Ticket médio (R$k/mês)</span><span class="sv" id="v-tt">10k</span></div><input type="range" min="8" max="20" value="10" id="sl-tt"></div></div>
+  <div class="rh"><div><div class="rh-l">MRR projetado</div><div class="rh-v" id="r-tmrr">R$160k</div></div><div><div class="rh-l">ARR projetado</div><div class="rh-v" id="r-tarr">R$1,92M</div></div></div>
+  <div class="pc"><div class="pl">Captura do SAM</div><div class="pb2" id="r-tpct">0,15%</div><div class="ps2">do mercado endereçável no cenário simulado</div></div>
+</div>
+
+<!-- receita -->
+<div class="ps" id="state-receita">
+  <div class="pc"><div class="pl">Simulador de Receita</div><p style="font-size:.82rem;color:var(--mid);line-height:1.5">Ajuste os parâmetros e veja como a receita evolui.</p></div>
+  <div class="pc"><div class="sg"><div class="st"><span class="sn">Clientes ativos</span><span class="sv" id="v-cl">5</span></div><input type="range" min="1" max="20" value="5" id="sl-cl"></div></div>
+  <div class="pc"><div class="sg"><div class="st"><span class="sn">Ticket mensal (R$k)</span><span class="sv" id="v-tk">10k</span></div><input type="range" min="8" max="15" value="10" id="sl-tk"></div></div>
+  <div class="pc"><div class="sg"><div class="st"><span class="sn">Duração média (meses)</span><span class="sv" id="v-ms">6</span></div><input type="range" min="3" max="24" value="6" id="sl-ms"></div></div>
+  <div class="rh"><div><div class="rh-l">MRR</div><div class="rh-v" id="r-mrr">R$50k</div></div><div><div class="rh-l">ARR</div><div class="rh-v" id="r-arr">R$600k</div></div></div>
+  <div class="pc"><div class="pl">Receita acumulada no contrato</div><div class="pb2" id="r-acum">R$300k</div><div class="ps2" id="r-acum-sub">5 × R$10k × 6 meses</div></div>
+</div>
+
+<!-- investimento -->
+<div class="ps" id="state-investimento">
+  <div class="pc"><div class="pl">Simulador de Investimento</div><p style="font-size:.82rem;color:var(--mid);line-height:1.5">Ajuste o aporte e o valuation pré-money.</p></div>
+  <div class="pc"><div class="sg"><div class="st"><span class="sn">Aporte (R$k)</span><span class="sv" id="v-ap">100k</span></div><input type="range" min="50" max="300" value="100" step="10" id="sl-ap"></div></div>
+  <div class="pc"><div class="sg"><div class="st"><span class="sn">Valuation pré (R$k)</span><span class="sv" id="v-vl">700k</span></div><input type="range" min="300" max="2000" value="700" step="50" id="sl-vl"></div></div>
+  <div class="rh"><div><div class="rh-l">Diluição</div><div class="rh-v" id="r-dil">12,5%</div></div><div><div class="rh-l">Valuation pós</div><div class="rh-v" id="r-pos">R$800k</div></div></div>
+  <div class="pc"><div class="pl">Sua participação no ARR alvo</div><div class="pb2" id="r-stake">R$240k</div><div class="ps2" id="r-stake-sub">Com ARR alvo de R$1,92M</div></div>
+  <div class="pc"><div class="pl">Uso do Capital</div><div class="mb" style="margin-top:5px">
+    <div class="mb-row"><span class="mb-n" style="width:120px">Execução criativa</span><div class="mb-t"><div class="mb-f g" style="width:60%"></div></div><span class="mb-v" id="uc-ex">R$60k</span></div>
+    <div class="mb-row"><span class="mb-n" style="width:120px">Prospecção</span><div class="mb-t"><div class="mb-f g" style="width:24%"></div></div><span class="mb-v" id="uc-pr">R$24k</span></div>
+    <div class="mb-row"><span class="mb-n" style="width:120px">Capital de giro</span><div class="mb-t"><div class="mb-f g" style="width:10%"></div></div><span class="mb-v" id="uc-gi">R$10k</span></div>
+    <div class="mb-row"><span class="mb-n" style="width:120px">Infraestrutura</span><div class="mb-t"><div class="mb-f g" style="width:6%"></div></div><span class="mb-v" id="uc-in">R$6k</span></div>
+  </div></div>
+  <div class="pc"><div class="pl">Runway · burn mensal</div>
+    <div class="sg" style="margin-top:6px"><div class="st"><span class="sn">Burn mensal (R$k)</span><span class="sv" id="v-bn">18k</span></div><input type="range" min="8" max="40" value="18" id="sl-bn"></div>
+    <div style="display:flex;justify-content:space-between;margin-top:12px;margin-bottom:5px">
+      <span style="font-size:.7rem;color:var(--light)">Hoje</span>
+      <span style="font-size:.7rem;color:var(--light)">Break-even <strong id="r-bem" style="color:var(--dark)">mês 5</strong></span>
+      <span style="font-size:.7rem;color:var(--light)">Mês 12</span>
+    </div>
+    <div class="rw-chart" id="rwChart"></div>
+    <div class="rw-lbls" id="rwLbls"></div>
+    <div class="rh" style="margin-top:10px"><div><div class="rh-l">Capital dura</div><div class="rh-v" id="r-rw">5 meses</div></div><div><div class="rh-l">Break-even MRR</div><div class="rh-v" id="r-bemrr">R$18k</div></div></div>
+  </div>
+</div>
+
+</div><!-- /pb -->
+<div class="pf">
+  <div class="mp"><span class="mv">R$11,3k</span><span class="ml">MRR atual</span></div>
+  <div class="mp"><span class="mv">R$10k</span><span class="ml">ticket</span></div>
+  <div class="mp"><span class="mv">R$100k</span><span class="ml">captando</span></div>
+  <div class="mp"><span class="mv">9–17%</span><span class="ml">dilution</span></div>
+</div>
+</div><!-- /panel -->
+
+<script>
+// helpers
+const fmt=n=>n>=1e6?'R$'+(n/1e6).toFixed(2).replace('.',',')+'M':n>=1e3?'R$'+(n/1e3).toFixed(0)+'k':'R$'+n;
+const fmtP=n=>n.toFixed(1)+'%';
+
+// typewriter
+const story='Em maio de 2025, saí da Bring IT depois de 24 meses. Em uma semana, o C-staff me chamou de volta — como fornecedor recorrente. Esse padrão eu vi repetir em 6 anos: toda empresa tem estratégia criativa e tem produção. O que nenhuma tem é a camada entre as duas.';
+const el=document.getElementById('heroStory');
+const cur=document.createElement('span');cur.className='cursor';el.appendChild(cur);
+let ci=0;
+function type(){
+  if(ci<story.length){el.insertBefore(document.createTextNode(story[ci]),cur);ci++;setTimeout(type,ci<20?50:ci<80?28:16);}
+  else{cur.style.display='none';setTimeout(()=>document.getElementById('heroReveal').classList.add('show'),300);}
+}
+setTimeout(type,500);
+
+// toggle
+document.querySelectorAll('.toggle-tab').forEach(t=>t.addEventListener('click',()=>{
+  const w=t.closest('.toggle-wrap');
+  w.querySelectorAll('.toggle-tab').forEach(x=>x.classList.remove('active'));
+  w.querySelectorAll('.toggle-panel').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  w.querySelector('#'+t.dataset.target).classList.add('active');
+}));
+
+// why now
+const wnItems=document.querySelectorAll('.wn-item');
+let wnDone=false;
+function triggerWN(){
+  if(wnDone)return;wnDone=true;
+  wnItems.forEach(it=>setTimeout(()=>it.classList.add('vis'),parseInt(it.dataset.d||0)));
+  setTimeout(()=>document.getElementById('wnFill').style.width='100%',80);
+}
+
+// steps
+const stepRows=document.querySelectorAll('.step-row');
+let stDone=false;
+function triggerSteps(){
+  if(stDone)return;stDone=true;
+  stepRows.forEach((r,i)=>setTimeout(()=>r.classList.add('vis'),i*110));
+}
+
+// comp map
+const cdots=document.querySelectorAll('.cdot');
+let compDone=false;
+function triggerComp(){
+  if(compDone)return;compDone=true;
+  cdots.forEach((d,i)=>setTimeout(()=>d.classList.add('vis'),i*140));
+}
+
+// venn — floating circles that repel from the cursor
+const vennEl=document.getElementById('venn');
+let vennStarted=false;
+function triggerVenn(){
+  if(!vennEl)return;
+  vennEl.classList.add('vis');
+  if(vennStarted)return;vennStarted=true;
+  const circles=[...vennEl.querySelectorAll('.venn-circle')].map((el,i)=>({
+    el,x:0,y:0,tx:0,ty:0,sc:.88,phase:i*2.1,sp:.6+i*.18,amp:5+i*2
+  }));
+  const R=270,MAX=64;       // raio de influência e empurrão máximo
+  let mx=null,my=null,active=false;
+  vennEl.addEventListener('mousemove',e=>{
+    const r=vennEl.getBoundingClientRect();
+    mx=e.clientX-r.left;my=e.clientY-r.top;active=true;
+  });
+  vennEl.addEventListener('mouseleave',()=>{active=false;});
+  const t0=performance.now();
+  (function loop(now){
+    const t=(now-t0)/1000;
+    circles.forEach(c=>{
+      const cx=c.el.offsetLeft+c.el.offsetWidth/2;
+      const cy=c.el.offsetTop+c.el.offsetHeight/2;
+      // flutuação idle
+      let bx=Math.sin(t*c.sp+c.phase)*c.amp;
+      let by=Math.cos(t*c.sp*.9+c.phase)*c.amp;
+      // repulsão do mouse
+      if(active&&mx!=null){
+        const dx=cx-mx,dy=cy-my,d=Math.hypot(dx,dy)||1;
+        if(d<R){const f=(1-d/R)*(1-d/R)*MAX;bx+=dx/d*f;by+=dy/d*f;}
+      }
+      c.tx=bx;c.ty=by;
+      c.x+=(c.tx-c.x)*.10;c.y+=(c.ty-c.y)*.10;
+      c.sc+=(1-c.sc)*.08;
+      c.el.style.transform='translate('+c.x.toFixed(2)+'px,'+c.y.toFixed(2)+'px) scale('+c.sc.toFixed(3)+')';
+    });
+    requestAnimationFrame(loop);
+  })(t0);
+}
+
+// tam bars
+const tamRows=document.querySelectorAll('.tam-row');
+let tamDone=false;
+function triggerTam(){
+  if(tamDone)return;tamDone=true;
+  tamRows.forEach((r,i)=>setTimeout(()=>{
+    r.classList.add('vis');
+    const f=r.querySelector('.tam-fill');
+    if(f)f.style.width=f.dataset.w+'%';
+  },i*150));
+}
+
+// panel + scroll
+const sections=document.querySelectorAll('.section');
+const narrative=document.getElementById('narrative');
+const pCtx=document.getElementById('pCtx');
+const prog=document.getElementById('prog');
+const labels={overview:'Visão Geral',custo:'Calculadora de Custo',solucao:'A Solução',whynow:'Por Que Agora',produto:'O Produto',diferencial:'Posicionamento',mercado:'Sinais de Mercado',time:'Time',tam:'Mercado Endereçável',receita:'Simulador de Receita',investimento:'Simulador de Investimento'};
+
+const navMapEl=document.getElementById('navDots');
+const navNames=['Abertura','Problema','Solução','Por que agora','Produto','Posicionamento','Sinais de mercado','Time','TAM · SAM · SOM','Modelo de receita','Captação'];
+const navTrack=document.createElement('div');navTrack.className='nav-track';
+const navTrackFill=document.createElement('div');navTrackFill.className='nav-track-fill';
+navTrack.appendChild(navTrackFill);navMapEl.appendChild(navTrack);
+const dotEls=[];
+sections.forEach((s,i)=>{
+  const item=document.createElement('div');item.className='nav-item'+(i===0?' active':'');
+  item.innerHTML='<span class="nd"></span><span class="nl">'+(navNames[i]||('Seção '+(i+1)))+'</span>';
+  item.onclick=()=>goTo(i);
+  navMapEl.appendChild(item);dotEls.push(item);
+});
+
+let curPanel='overview';
+function switchPanel(id){
+  if(id===curPanel)return;curPanel=id;
+  document.querySelectorAll('.ps').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById('state-'+id);if(el)el.classList.add('active');
+  pCtx.textContent=labels[id]||id;
+}
+
+const counted=new Set();
+function countUp(el){
+  if(counted.has(el))return;counted.add(el);
+  const to=parseInt(el.dataset.to),sfx=el.dataset.sfx||'',dur=1100,s0=performance.now();
+  (function tick(now){const p=Math.min((now-s0)/dur,1);el.textContent=Math.round(to*p)+sfx;if(p<1)requestAnimationFrame(tick);})(s0);
+}
+
+let curIdx=0,locking=false;
+function goTo(idx){
+  idx=Math.max(0,Math.min(sections.length-1,idx));
+  curIdx=idx;
+  const s=sections[idx];
+  narrative.scrollTo({top:s.offsetTop,behavior:'smooth'});
+  const pct=idx/(sections.length-1)*100;
+  prog.style.width=pct+'%';
+  navTrackFill.style.height=pct+'%';
+  s.querySelectorAll('.cu').forEach(countUp);
+  if(s.id==='sec-wn')triggerWN();
+  if(s.id==='sec-prod')triggerSteps();
+  if(s.id==='sec-comp')triggerComp();
+  if(s.dataset.panel==='solucao')triggerVenn();
+  if(s.dataset.panel==='tam')triggerTam();
+  switchPanel(s.dataset.panel);
+  dotEls.forEach((d,i)=>d.classList.toggle('active',i===idx));
+}
+
+function step(dir){
+  if(locking)return;
+  const next=curIdx+dir;
+  if(next<0||next>sections.length-1)return;
+  locking=true;
+  goTo(next);
+  setTimeout(()=>{locking=false;},760);
+}
+
+// wheel over the narrative drives page navigation (panel keeps native scroll)
+narrative.addEventListener('wheel',e=>{
+  e.preventDefault();
+  if(Math.abs(e.deltaY)<8)return;
+  step(e.deltaY>0?1:-1);
+},{passive:false});
+
+// keyboard
+window.addEventListener('keydown',e=>{
+  if(['ArrowDown','PageDown',' '].includes(e.key)){e.preventDefault();step(1);}
+  if(['ArrowUp','PageUp'].includes(e.key)){e.preventDefault();step(-1);}
+  if(e.key==='Home'){e.preventDefault();goTo(0);}
+  if(e.key==='End'){e.preventDefault();goTo(sections.length-1);}
+});
+
+// touch swipe (mobile / trackpad gestures)
+let touchY=null;
+narrative.addEventListener('touchstart',e=>{touchY=e.touches[0].clientY;},{passive:true});
+narrative.addEventListener('touchend',e=>{
+  if(touchY===null)return;
+  const dy=touchY-e.changedTouches[0].clientY;
+  if(Math.abs(dy)>40)step(dy>0?1:-1);
+  touchY=null;
+});
+
+// init
+goTo(0);
+
+// ===== cost simulator =====
+// hourly rates (local currency) by region, [Jr, Pl, Sr] — fonte: Pesquisa Mercado Criativo 2026
+const csRoles=[
+  {n:'Brand Designer',     BRL:[32.11,53.18,85.69],  USD:[33.47,55.30,88.91],  EUR:[24.75,40.83,65.55]},
+  {n:'UI/UX Designer',     BRL:[43.36,71.84,115.78], USD:[52.62,86.96,139.85], EUR:[29.62,48.80,78.26]},
+  {n:'Motion Designer',    BRL:[34.14,56.54,91.09],  USD:[36.19,59.77,96.08],  EUR:[26.88,44.31,71.12]},
+  {n:'Video Editor',       BRL:[29.53,48.89,78.75],  USD:[31.25,51.62,83.00],  EUR:[22.19,36.59,58.75]},
+  {n:'Front-End Dev',      BRL:[44.92,74.34,119.69], USD:[51.41,84.89,136.44], EUR:[31.56,52.03,83.50]},
+  {n:'Illustrator / 3D',   BRL:[31.56,52.25,84.16],  USD:[35.78,59.08,94.94],  EUR:[24.75,40.83,65.55]},
+  {n:'Sound Designer',     BRL:[29.53,48.89,78.75],  USD:[35.78,59.08,94.94],  EUR:[23.25,38.34,61.54]},
+  {n:'Creative Director',  BRL:[78.12,129.38,208.44],USD:[72.38,119.54,192.15],EUR:[47.81,78.91,126.75]},
+];
+// SaaS base USD/mês
+const csSaasData=[
+  {n:'Midjourney Pro',usd:60},
+  {n:'Figma Enterprise',usd:90},
+  {n:'Adobe CC Pro Teams',usd:99.99},
+  {n:'Shutterstock Team',usd:48.90},
+  {n:'Stack ágil (Slack+Notion+Jira+GSuite)',usd:56.91},
+];
+const csCur={BRL:{loc:'pt-BR',code:'BRL',usd:5.1},USD:{loc:'en-US',code:'USD',usd:1},EUR:{loc:'de-DE',code:'EUR',usd:0.92}};
+const COPS_BRL=10000; // preço COps em R$
+// estado: cada função {on, lvl(0..2), hrs}; cada saas {on}
+const csState=csRoles.map((r,i)=>({on:false,lvl:1,hrs:160}));
+const csSaasState=csSaasData.map((s,i)=>({on:false}));
+let csCurKey='BRL';
+const CHK='<svg viewBox="0 0 10 10"><path d="M1 5l2.5 2.5L9 2" fill="none" stroke="#1A1A1A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+function csFmt(v){return new Intl.NumberFormat(csCur[csCurKey].loc,{style:'currency',currency:csCur[csCurKey].code,maximumFractionDigits:0}).format(v);}
+
+function csBuild(){
+  const tbl=document.getElementById('csTable');tbl.innerHTML='';
+  csRoles.forEach((r,i)=>{
+    const row=document.createElement('div');row.className='cs-row'+(csState[i].on?' on':' off');
+    row.innerHTML='<div class="cs-cb">'+CHK+'</div>'+
+      '<div class="cs-name">'+r.n+'</div>'+
+      '<div class="cs-lv">'+['JR','PL','SR'].map((l,j)=>'<div class="cs-lvb'+(csState[i].lvl===j?' on':'')+'" data-lv="'+j+'">'+l+'</div>').join('')+'</div>'+
+      '<input class="cs-hrs" type="text" inputmode="numeric" value="'+csState[i].hrs+'">'+
+      '<div class="cs-sub" data-sub></div>';
+    // toggle on/off (click row, but not on level/hrs)
+    row.querySelector('.cs-cb').addEventListener('click',e=>{e.stopPropagation();csState[i].on=!csState[i].on;csBuild();});
+    row.querySelector('.cs-name').addEventListener('click',()=>{csState[i].on=!csState[i].on;csBuild();});
+    row.querySelectorAll('.cs-lvb').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();csState[i].lvl=+b.dataset.lv;csState[i].on=true;csBuild();}));
+    const hrs=row.querySelector('.cs-hrs');
+    hrs.addEventListener('click',e=>e.stopPropagation());
+    hrs.addEventListener('input',()=>{csState[i].hrs=Math.max(0,Math.min(320,parseInt(hrs.value)||0));csCalc();});
+    tbl.appendChild(row);
+  });
+  const sa=document.getElementById('csSaas');sa.innerHTML='';
+  csSaasData.forEach((s,i)=>{
+    const row=document.createElement('div');row.className='cs-saas'+(csSaasState[i].on?' on':' off');
+    row.innerHTML='<div class="cs-cb">'+CHK+'</div><div class="cs-name">'+s.n+'</div><div class="cs-saas-v" data-sv></div>';
+    row.addEventListener('click',()=>{csSaasState[i].on=!csSaasState[i].on;csBuild();});
+    sa.appendChild(row);
+  });
+  csCalc();
+}
+
+function csCalc(){
+  let total=0;
+  document.querySelectorAll('#csTable .cs-row').forEach((row,i)=>{
+    const rate=csRoles[i][csCurKey][csState[i].lvl];
+    const sub=rate*csState[i].hrs;
+    if(csState[i].on)total+=sub;
+    row.querySelector('[data-sub]').textContent=csState[i].on?csFmt(sub):'—';
+  });
+  const usdToCur=csCur[csCurKey].usd;
+  document.querySelectorAll('#csSaas .cs-saas').forEach((row,i)=>{
+    const v=csSaasData[i].usd*usdToCur;
+    if(csSaasState[i].on)total+=v;
+    row.querySelector('[data-sv]').textContent=csFmt(v);
+  });
+  // COps em moeda selecionada (preço base R$10k)
+  const cops=csCurKey==='BRL'?COPS_BRL:(COPS_BRL/5.1)*usdToCur;
+  document.getElementById('csInhouse').textContent=csFmt(total);
+  document.getElementById('csCops').textContent=csFmt(cops);
+  const save=Math.max(0,(total-cops)*12);
+  document.getElementById('csSave').textContent=csFmt(save);
+  const mult=total>0?(total/cops).toFixed(1):'0';
+  document.getElementById('csSaveSub').textContent=total>cops?('o time interno custa '+mult+'× o COps · economize por ano'):'monte o time acima pra ver a economia';
+}
+
+document.getElementById('csRegion').addEventListener('change',e=>{csCurKey=e.target.value;csBuild();});
+csBuild();
+
+function calcTam(){
+  const c=+document.getElementById('sl-tc').value,t=+document.getElementById('sl-tt').value;
+  document.getElementById('v-tc').textContent=c;document.getElementById('v-tt').textContent=t+'k';
+  const mrr=c*t*1000,arr=mrr*12;
+  document.getElementById('r-tmrr').textContent=fmt(mrr);
+  document.getElementById('r-tarr').textContent=fmt(arr);
+  document.getElementById('r-tpct').textContent=fmtP(arr/950000000*100);
+}
+['sl-tc','sl-tt'].forEach(id=>document.getElementById(id).addEventListener('input',calcTam));calcTam();
+
+function calcReceita(){
+  const c=+document.getElementById('sl-cl').value,t=+document.getElementById('sl-tk').value,m=+document.getElementById('sl-ms').value;
+  document.getElementById('v-cl').textContent=c;document.getElementById('v-tk').textContent=t+'k';document.getElementById('v-ms').textContent=m;
+  document.getElementById('r-mrr').textContent=fmt(c*t*1000);
+  document.getElementById('r-arr').textContent=fmt(c*t*1000*12);
+  document.getElementById('r-acum').textContent=fmt(c*t*1000*m);
+  document.getElementById('r-acum-sub').textContent=c+' × R$'+t+'k × '+m+' meses';
+}
+['sl-cl','sl-tk','sl-ms'].forEach(id=>document.getElementById(id).addEventListener('input',calcReceita));calcReceita();
+
+function calcRunway(){
+  const ap=+document.getElementById('sl-ap').value*1000,bn=+document.getElementById('sl-bn').value*1000;
+  document.getElementById('v-bn').textContent=(bn/1000)+'k';
+  const chart=document.getElementById('rwChart'),lbls=document.getElementById('rwLbls');
+  chart.innerHTML='';lbls.innerHTML='';
+  let cap=ap,mrr=11320,bem=null;const bars=[];
+  for(let m=1;m<=12;m++){mrr+=10000;cap=cap-bn+mrr;const ok=mrr>=bn;if(!bem&&ok)bem=m;bars.push({m,cap:Math.max(0,cap),ok,be:bem===m});}
+  const mx=Math.max(...bars.map(b=>b.cap),ap);
+  bars.forEach(b=>{
+    const bar=document.createElement('div');bar.className='rw-bar '+(b.be?'b':b.ok?'s':'a');
+    bar.style.height=Math.max(3,b.cap/mx*62)+'px';chart.appendChild(bar);
+    const l=document.createElement('div');l.className='rw-lbl';l.textContent=b.m%3===0?'M'+b.m:'';lbls.appendChild(l);
+  });
+  const gone=bars.findIndex(b=>b.cap<=0);
+  document.getElementById('r-rw').textContent=(gone===-1?'12+':gone+1)+' meses';
+  document.getElementById('r-bemrr').textContent=fmt(bn);
+  document.getElementById('r-bem').textContent=bem?'mês '+bem:'> 12';
+}
+
+function calcInvest(){
+  const ap=+document.getElementById('sl-ap').value*1000,vl=+document.getElementById('sl-vl').value*1000;
+  document.getElementById('v-ap').textContent=(ap/1000)+'k';document.getElementById('v-vl').textContent=(vl/1000)+'k';
+  const pos=vl+ap,dil=ap/pos*100;
+  document.getElementById('r-dil').textContent=fmtP(dil);document.getElementById('r-pos').textContent=fmt(pos);
+  const arr=16*10000*12;
+  document.getElementById('r-stake').textContent=fmt(arr*dil/100);
+  document.getElementById('r-stake-sub').textContent='Com ARR alvo de '+fmt(arr);
+  document.getElementById('uc-ex').textContent=fmt(ap*.6);document.getElementById('uc-pr').textContent=fmt(ap*.24);
+  document.getElementById('uc-gi').textContent=fmt(ap*.1);document.getElementById('uc-in').textContent=fmt(ap*.06);
+  calcRunway();
+}
+['sl-ap','sl-vl'].forEach(id=>document.getElementById(id).addEventListener('input',calcInvest));
+document.getElementById('sl-bn').addEventListener('input',calcRunway);
+calcInvest();
+</script>
+</body>
+</html>
