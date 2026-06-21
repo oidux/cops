@@ -283,6 +283,56 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
 
 /* countup */
 .cu{display:inline}
+
+/* journey — fixed timeline with hover/click detail */
+.jt2-hint{display:inline-flex;align-items:center;gap:7px;margin-top:16px;font-size:.72rem;font-weight:600;color:var(--mid);background:var(--card);border:1px solid var(--border);border-radius:20px;padding:6px 13px}
+.jt2-hint b{display:inline-flex;width:15px;height:15px;border-radius:50%;background:var(--dark);color:var(--green);align-items:center;justify-content:center;font-size:.7rem;font-weight:800}
+.jt2{position:relative;margin-top:14px;padding-bottom:34px}
+.jt2-pop{display:none}
+.jt2-pop2{position:fixed;width:250px;background:var(--dark);color:#f4f2ec;font-size:.71rem;line-height:1.45;padding:11px 13px;border-radius:10px;box-shadow:0 14px 34px rgba(0,0,0,.3);opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .16s ease,transform .16s ease;z-index:99999;pointer-events:none}
+.jt2-pop2.show{opacity:1;visibility:visible;transform:none}
+.jt2-pop2 b{color:var(--green);display:block;font-size:.74rem;margin-bottom:4px}
+.jt2-pop2::before{content:'';position:absolute;bottom:100%;left:var(--arrow,18px);border:6px solid transparent;border-bottom-color:var(--dark)}
+.jt2-gl{position:absolute;top:0;bottom:34px;width:1px;background:rgba(208,204,195,.45);z-index:0}
+.jt2-lanes{position:relative;display:flex;flex-direction:column;gap:13px;z-index:2}
+.jt2-lane{position:relative;height:40px;z-index:1}
+.jt2-lane:hover,.jt2-lane.lift{z-index:50}
+.jt2-item{position:absolute;top:0;bottom:0;cursor:pointer}
+.jt2-lbl{position:absolute;bottom:11px;left:0;white-space:nowrap;line-height:1.15;opacity:0;transform:translateY(6px);transition:opacity .4s ease,transform .4s ease}
+.jt2-lane.vis .jt2-lbl{opacity:1;transform:none}
+.jt2-item.r .jt2-lbl{left:auto;right:0;text-align:right}
+.jt2-nm{font-size:.73rem;font-weight:700;color:var(--dark)}
+.jt2-dt{display:block;font-size:.6rem;font-weight:600;color:var(--light);margin-top:1px}
+.jt2-bar{position:absolute;bottom:0;left:0;right:0;height:6px;border-radius:3px;background:var(--dark);transform:scaleX(0);transform-origin:left;transition:transform .7s cubic-bezier(.4,0,.2,1),height .15s ease}
+.jt2-item.r .jt2-bar{transform-origin:right}
+.jt2-lane.vis .jt2-bar{transform:scaleX(1)}
+.jt2-bar.green{background:var(--green);box-shadow:inset 0 0 0 1px var(--dark)}
+.jt2-bar.par{background:repeating-linear-gradient(90deg,var(--light) 0 5px,transparent 5px 10px);height:4px}
+.jt2-bar.out{background:var(--bg);border:2px solid var(--dark);box-sizing:border-box;height:9px;border-radius:5px}
+.jt2-item:hover .jt2-bar,.jt2-item.open .jt2-bar{height:10px;border-radius:5px}
+.jt2-pop{position:absolute;top:calc(100% + 12px);left:0;width:248px;background:var(--dark);color:#f4f2ec;font-size:.7rem;line-height:1.45;padding:11px 13px;border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.28);opacity:0;visibility:hidden;transform:translateY(6px);transition:opacity .18s ease,transform .18s ease,visibility .18s;z-index:60;pointer-events:none}
+.jt2-pop::before{content:'';position:absolute;bottom:100%;left:18px;border:6px solid transparent;border-bottom-color:var(--dark)}
+.jt2-item.r .jt2-pop{left:auto;right:0}
+.jt2-item.r .jt2-pop::before{left:auto;right:18px}
+.jt2-pop b{color:var(--green);display:block;font-size:.73rem;margin-bottom:4px}
+.jt2-item:hover .jt2-pop,.jt2-item.open .jt2-pop{opacity:1;visibility:visible;transform:none}
+#jt2.pinned .jt2-item:not(.open):hover .jt2-pop{opacity:0;visibility:hidden;transform:translateY(6px)}
+.jt2-item:hover,.jt2-item.open{z-index:40}
+.jt2-axis{position:absolute;left:0;right:0;bottom:18px;height:2px;background:var(--dark);z-index:1}
+.jt2-yr{position:absolute;bottom:0;transform:translateX(-50%);font-size:.74rem;font-weight:800;color:var(--mid);z-index:1}
+.jt2-yr.g{color:var(--dark)}
+.jt2-yr::before{content:'';position:absolute;top:-9px;left:50%;transform:translateX(-50%);width:7px;height:7px;border-radius:50%;background:var(--bg);border:2px solid var(--dark)}
+.jt2-yr.g::before{background:var(--green);border-color:var(--dark)}
+
+/* source citation */
+.src{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:4px;background:var(--border);color:var(--mid);margin-left:5px;vertical-align:middle;cursor:pointer;position:relative;text-decoration:none;flex-shrink:0;transition:background .15s,color .15s;opacity:.7}
+.src::before{content:'↗';font-size:.72rem;font-weight:700;line-height:1}
+.src:hover{background:var(--dark);color:#fff;opacity:1}
+.src::after{content:attr(data-tip);position:absolute;bottom:142%;left:50%;transform:translateX(-50%) translateY(4px);background:var(--dark);color:#fff;font-size:.66rem;font-weight:600;padding:5px 9px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;z-index:400;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.src:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
+/* source on green/dark backgrounds */
+.on-green .src,[style*="--green"] .src{background:rgba(0,0,0,.18);color:rgba(0,0,0,.7)}
+.on-green .src:hover,[style*="--green"] .src:hover{background:var(--dark);color:#fff}
 </style>
 </head>
 <body>
@@ -321,9 +371,9 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
     </div>
     <div class="toggle-panel active" id="sem-cops">
       <div class="chaos-grid">
-        <div class="ci bad"><div class="ci-icon">🔥</div><div class="ci-title"><span class="cu" data-to="44" data-sfx="%">0%</span> in burnout</div><div class="ci-desc">Fragmented teams — everyone requests, no one prioritizes</div></div>
-        <div class="ci bad"><div class="ci-icon">💸</div><div class="ci-title">1.78× higher cost</div><div class="ci-desc">Inconsistent brands pay more per acquisition</div></div>
-        <div class="ci bad"><div class="ci-icon">📋</div><div class="ci-title"><span class="cu" data-to="59" data-sfx="%">0%</span> of CMOs</div><div class="ci-desc">No resources to execute the strategy they defined</div></div>
+        <div class="ci bad"><div class="ci-icon">🔥</div><div class="ci-title"><span class="cu" data-to="44" data-sfx="%">0%</span> in burnout<a class="src" href="https://www.canto.com/press-releases/cantos-state-of-digital-content-report-new-research-reveals-key-digital-content-trends-for-2026/" target="_blank" rel="noopener" data-tip="Canto · State of Digital Content 2026"></a></div><div class="ci-desc">Fragmented teams — everyone requests, no one prioritizes</div></div>
+        <div class="ci bad"><div class="ci-icon">💸</div><div class="ci-title">1.78× higher cost<a class="src" href="https://www.amraandelma.com/brand-consistency-roi-statistics/" target="_blank" rel="noopener" data-tip="Nielsen Media Efficiency Report 2026"></a></div><div class="ci-desc">Inconsistent brands pay more per acquisition</div></div>
+        <div class="ci bad"><div class="ci-icon">📋</div><div class="ci-title"><span class="cu" data-to="59" data-sfx="%">0%</span> of CMOs<a class="src" href="https://www.gartner.com/en/newsroom/press-releases/2026-05-11-gartner-2026-cmo-spend-survey-finds-cmos-allocate-15-point-3-percent-of-marketing-budgets-to-ai-but-only-30-percent-are-ready-to-scale-ai-capabilities" target="_blank" rel="noopener" data-tip="Gartner CMO Spend Survey 2026"></a></div><div class="ci-desc">No resources to execute the strategy they defined</div></div>
         <div class="ci bad"><div class="ci-icon">📉</div><div class="ci-title">R$30–48k/mo</div><div class="ci-desc">Team cost with no system — money with no traceability</div></div>
       </div>
     </div>
@@ -368,7 +418,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
       <div class="venn-end"><b>Art</b><span>beautiful, but doesn't sell</span></div>
       <div class="venn-end r"><b>Commodity</b><span>volume with no differentiation</span></div>
     </div>
-    <div class="venn-note"><b>Plus:</b> the AI boom and the misuse of innovation tools push brands toward both extremes — reinforcing the need for the middle layer even more.</div>
+    <div class="venn-note"><b>Plus:</b> the AI boom and the misuse of innovation tools push brands toward both extremes — reinforcing the need for the middle layer even more.<a class="src" href="https://www.meioemensagem.com.br/opiniao/a-agencia-agentica" target="_blank" rel="noopener" data-tip="Meio &amp; Mensagem · The Agentic Agency 2026"></a></div>
   </div>
 </div>
 </section>
@@ -383,9 +433,9 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
     <div class="wn-line"><div class="wn-fill" id="wnFill"></div></div>
     <div class="wn-grid">
       <div class="wn-item" data-d="0"><div class="wn-dot">1</div><div class="wn-yr">2019–2022</div><div class="wn-sig">AI made production a commodity</div><div class="wn-desc">Generation tools exploded. Volume got easy. Differentiation got impossible without a system.</div></div>
-      <div class="wn-item" data-d="160"><div class="wn-dot">2</div><div class="wn-yr">2022–2024</div><div class="wn-sig">In-housing explodes</div><div class="wn-desc">82% of brands brought creative in-house. With no ops, it turned into internal chaos.</div></div>
-      <div class="wn-item" data-d="320"><div class="wn-dot">3</div><div class="wn-yr">2024</div><div class="wn-sig">Market validates the model</div><div class="wn-desc">Accenture buys Whalar for $300M. Recurring creative ops becomes a billion-dollar asset.</div></div>
-      <div class="wn-item" data-d="480"><div class="wn-dot">4</div><div class="wn-yr">2026 →</div><div class="wn-sig">The window is open</div><div class="wn-desc">60% cut their agency. 120k fractional CMOs. Brazilian mid-market with no solution. COps arrives.</div></div>
+      <div class="wn-item" data-d="160"><div class="wn-dot">2</div><div class="wn-yr">2022–2024</div><div class="wn-sig">In-housing explodes</div><div class="wn-desc">82% of brands brought creative in-house.<a class="src" href="https://www.emarketer.com/content/faq-on-ad-agencies--consolidation--ai-disruption--what-s-changing-2026" target="_blank" rel="noopener" data-tip="ANA / eMarketer 2026"></a> With no ops, it turned into internal chaos.</div></div>
+      <div class="wn-item" data-d="320"><div class="wn-dot">3</div><div class="wn-yr">2024</div><div class="wn-sig">Market validates the model</div><div class="wn-desc">Accenture buys Whalar for $300M.<a class="src" href="https://newsroom.accenture.com/news/2026/accenture-to-acquire-leading-creator-and-social-agency-whalar-from-whalar-group" target="_blank" rel="noopener" data-tip="Accenture Newsroom 2026"></a> Recurring creative ops becomes a billion-dollar asset.</div></div>
+      <div class="wn-item" data-d="480"><div class="wn-dot">4</div><div class="wn-yr">2026 →</div><div class="wn-sig">The window is open</div><div class="wn-desc">60% cut their agency.<a class="src" href="https://www.emarketer.com/content/faq-on-ad-agencies--consolidation--ai-disruption--what-s-changing-2026" target="_blank" rel="noopener" data-tip="eMarketer 2026"></a> 120k fractional CMOs.<a class="src" href="https://www.digitalapplied.com/blog/fractional-cmo-2026-when-it-beats-full-time-hire-decision-matrix" target="_blank" rel="noopener" data-tip="DigitalApplied / Gartner 2026"></a> Brazilian mid-market with no solution. COps arrives.</div></div>
     </div>
   </div>
 </div>
@@ -434,18 +484,50 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
   <div class="lbl">Market Signals</div>
   <h2>The creative market is being <span class="em">reshaped</span>.</h2>
   <div class="cards-row">
-    <div class="card"><div class="card-lbl">Acquisition</div><div class="card-big">$300M</div><div class="card-desc">Accenture acquires Whalar — recurring creative ops are worth billions</div></div>
-    <div class="card"><div class="card-lbl">Market Signal</div><div class="card-big"><span class="cu" data-to="60" data-sfx="%">0%</span></div><div class="card-desc">of brands cut their external agency</div></div>
+    <div class="card"><div class="card-lbl">Acquisition</div><div class="card-big">$300M</div><div class="card-desc">Accenture acquires Whalar — recurring creative ops are worth billions<a class="src" href="https://newsroom.accenture.com/news/2026/accenture-to-acquire-leading-creator-and-social-agency-whalar-from-whalar-group" target="_blank" rel="noopener" data-tip="Accenture Newsroom 2026"></a></div></div>
+    <div class="card"><div class="card-lbl">Market Signal</div><div class="card-big"><span class="cu" data-to="60" data-sfx="%">0%</span></div><div class="card-desc">of brands cut their external agency<a class="src" href="https://www.emarketer.com/content/faq-on-ad-agencies--consolidation--ai-disruption--what-s-changing-2026" target="_blank" rel="noopener" data-tip="eMarketer 2026"></a></div></div>
   </div>
   <div class="cards-row">
-    <div class="card"><div class="card-lbl">Behavior</div><div class="card-big">33k</div><div class="card-desc">brands: the edge is a creative engine, not a media tactic</div></div>
-    <div class="card"><div class="card-lbl">Demand</div><div class="card-big"><span class="cu" data-to="120" data-sfx="k">0k</span></div><div class="card-desc">fractional CMOs — demand has doubled</div></div>
+    <div class="card"><div class="card-lbl">Behavior</div><div class="card-big">33k</div><div class="card-desc">brands: the edge is a creative engine, not a media tactic<a class="src" href="https://exame.com/bussola/o-que-e-diversidade-criativa-e-como-ela-virou-o-jogo-na-publicidade-digital/" target="_blank" rel="noopener" data-tip="Exame / Triple Whale 2026"></a></div></div>
+    <div class="card"><div class="card-lbl">Demand</div><div class="card-big"><span class="cu" data-to="120" data-sfx="k">0k</span></div><div class="card-desc">fractional CMOs — demand has doubled<a class="src" href="https://www.digitalapplied.com/blog/fractional-cmo-2026-when-it-beats-full-time-hire-decision-matrix" target="_blank" rel="noopener" data-tip="DigitalApplied / Gartner 2026"></a></div></div>
   </div>
 </div>
 </section>
 
-<!-- 7: TIME -->
-<section class="section" data-section="7" data-panel="time">
+<!-- 7: JOURNEY -->
+<section class="section" data-section="7" data-panel="journey" id="sec-tl">
+<div class="sc">
+  <div class="lbl">The Journey</div>
+  <h2>It's not a bet. It's what I've been <span class="em">diagnosing for 6 years</span>.</h2>
+  <p>The same gap kept reappearing from every side — as a maker, as a buyer, and from inside the company.</p>
+  <div class="jt2" id="jt2">
+    <div class="jt2-gl" style="left:2%"></div><div class="jt2-gl" style="left:14.94%"></div><div class="jt2-gl" style="left:27.89%"></div><div class="jt2-gl" style="left:40.83%"></div><div class="jt2-gl" style="left:53.78%"></div><div class="jt2-gl" style="left:66.72%"></div><div class="jt2-gl" style="left:79.66%"></div><div class="jt2-gl" style="left:92.61%"></div>
+    <div class="jt2-lanes">
+      <div class="jt2-lane">
+        <div class="jt2-item" style="left:2%;width:30.2%"><div class="jt2-lbl"><span class="jt2-nm">Ad agency</span><span class="jt2-dt">Jan 2019 – May 2021 · 2y 4m</span></div><div class="jt2-bar out"></div><div class="jt2-pop"><b>Ad agency · Goiânia</b>Full-stack designer: brand, identity, social, video, animation. First pain: good creative trapped in a way of operating I didn't agree with. Left because of it.</div></div>
+        <div class="jt2-item r" style="left:65.64%;width:5.39%"><div class="jt2-lbl"><span class="jt2-nm">Team Legacy</span><span class="jt2-dt">Dec 2023 – May 2024 · 6 mo</span></div><div class="jt2-bar out"></div><div class="jt2-pop"><b>Team Legacy</b>6 months at a pro CS &amp; Valorant team. I saw the other side: how creatives are treated — unstable pay, value unrecognized. The professional's pain, not just the client's.</div></div>
+      </div>
+      <div class="jt2-lane">
+        <div class="jt2-item" style="left:19.26%;width:19.42%"><div class="jt2-lbl"><span class="jt2-nm">Art direction</span><span class="jt2-dt">May 2020 – Nov 2021 · 1y 6m</span></div><div class="jt2-bar out"></div><div class="jt2-pop"><b>Art direction · partnership</b>Worked under an art director. Broken creative communication — briefs that don't arrive clear, expectations that don't translate into delivery. The pain of the layer missing before production.</div></div>
+        <div class="jt2-item r" style="left:71.03%;width:25.89%"><div class="jt2-lbl"><span class="jt2-nm">Bring IT</span><span class="jt2-dt">May 2024 – May 2026 · 24 months</span></div><div class="jt2-bar"></div><div class="jt2-pop"><b>Bring IT · 24 months in-house</b>The product wasn't design. From the inside: companies don't see creative investment as a necessity. The pain became a system. Left in May — and within a week the C-staff called me back as a recurring vendor.</div></div>
+      </div>
+      <div class="jt2-lane">
+        <div class="jt2-item" style="left:34.36%;width:31.28%"><div class="jt2-lbl"><span class="jt2-nm">Nest</span><span class="jt2-dt">Jul 2021 – Dec 2023 · 2y 5m</span></div><div class="jt2-bar"></div><div class="jt2-pop"><b>Nest · Business + community</b>Two years responsible for keeping brand identity applied. Here it became awareness: a consistent brand demands continuous operation, not one-off projects.</div></div>
+        <div class="jt2-item r" style="left:90.45%;width:7.55%"><div class="jt2-lbl"><span class="jt2-nm">COps conceived</span><span class="jt2-dt">Nov 2025 – Jun 2026 · 7 mo</span></div><div class="jt2-bar green"></div><div class="jt2-pop"><b>COps conceived</b>Conceived from the integration of the parallel clients — the synthesis of everything learned across six years.</div></div>
+      </div>
+      <div class="jt2-lane">
+        <div class="jt2-item" style="left:34.36%;width:56.1%"><div class="jt2-lbl"><span class="jt2-nm">Own clients</span><span class="jt2-dt">Jul 2021 – Nov 2025 · 4y 4m · parallel</span></div><div class="jt2-bar par"></div><div class="jt2-pop"><b>Own clients · in parallel</b>One-off projects running the whole period. I learned the market's pains from both sides — who hires and who delivers.</div></div>
+        <div class="jt2-item r" style="left:92.92%;width:5.08%"><div class="jt2-lbl"><span class="jt2-nm">The product is born</span><span class="jt2-dt">May 2026 → now</span></div><div class="jt2-bar green"></div><div class="jt2-pop"><b>The product is born</b>First contract closed fast at US$1,800 — the negotiation itself proved the value delivered sustains the R$10k base ticket from here on.</div></div>
+      </div>
+    </div>
+    <div class="jt2-axis"></div>
+    <div class="jt2-yr" style="left:2%">2019</div><div class="jt2-yr" style="left:14.94%">2020</div><div class="jt2-yr" style="left:27.89%">2021</div><div class="jt2-yr" style="left:40.83%">2022</div><div class="jt2-yr" style="left:53.78%">2023</div><div class="jt2-yr" style="left:66.72%">2024</div><div class="jt2-yr" style="left:79.66%">2025</div><div class="jt2-yr g" style="left:92.61%">2026</div>
+  </div>
+</div>
+</section>
+
+<!-- 8: TIME -->
+<section class="section" data-section="8" data-panel="time">
 <div class="sc">
   <div class="lbl">Team</div>
   <h2>Both sides<br><span class="em">of the loop</span>.</h2>
@@ -471,7 +553,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
       <div class="tam-fill" data-w="0"></div>
       <div class="tam-content">
         <div class="tam-tag">TAM</div>
-        <div class="tam-text"><div class="tam-name">Marketing Ops Management · global</div><div class="tam-sub">72–76% is software (Oracle, SAP, Adobe) · not where COps plays</div></div>
+        <div class="tam-text"><div class="tam-name">Marketing Ops Management · global<a class="src" href="https://www.360iresearch.com/library/intelligence/marketing-operations-management" target="_blank" rel="noopener" data-tip="360iResearch · Marketing Ops Market 2026"></a></div><div class="tam-sub">72–76% is software (Oracle, SAP, Adobe) · not where COps plays</div></div>
         <div class="tam-pct base">total market</div>
         <div class="tam-val">US$2.06B</div>
       </div>
@@ -515,7 +597,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
   <h2>Monthly subscription.<br><span class="em">3-month minimum.</span></h2>
   <div class="pricing-compare">
     <div class="pricing-col">
-      <div class="card-lbl">In-house team</div>
+      <div class="card-lbl">In-house team<a class="src" href="https://opiniaorh.com/2025/11/19/guia-salarial-robert-half-2026-fator-humano-e-tecnologia-redefinem-batalha-por-talentos-no-brasil/" target="_blank" rel="noopener" data-tip="Robert Half Salary Guide 2026"></a></div>
       <div style="margin-top:10px">
         <div class="p-role">Brand Designer</div><div class="p-cost">R$8–12k/mo</div>
         <div class="p-role">UI/UX Designer</div><div class="p-cost">R$5–8k/mo</div>
@@ -601,6 +683,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
   </div>
   <div class="rh"><div><div class="rh-l">In-house cost / mo</div><div class="rh-v" id="csInhouse">—</div></div><div style="text-align:right"><div class="rh-l">With COps</div><div class="rh-v" id="csCops">—</div></div></div>
   <div class="pc" style="background:var(--dark)"><div class="pl" style="color:var(--light)">Projected annual savings</div><div class="pb2" id="csSave" style="color:var(--green)">—</div><div class="ps2" style="color:var(--light)" id="csSaveSub">vs building and maintaining the team in-house</div></div>
+  <p style="font-size:.68rem;color:var(--light);line-height:1.5;margin-top:2px">Salary rates 2026 by role/level/region<a class="src" href="https://opiniaorh.com/2025/11/19/guia-salarial-robert-half-2026-fator-humano-e-tecnologia-redefinem-batalha-por-talentos-no-brasil/" target="_blank" rel="noopener" data-tip="Robert Half / Glassdoor / Indeed 2026"></a> · SaaS pricing<a class="src" href="https://www.vendr.com/marketplace/figma" target="_blank" rel="noopener" data-tip="Vendr · Figma / Adobe / Slack / Notion 2026"></a></p>
 </div>
 
 <!-- solucao -->
@@ -618,8 +701,8 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
 <!-- whynow -->
 <div class="ps" id="state-whynow">
   <div class="pc"><div class="pl">The window of opportunity</div><p style="font-size:.84rem;color:var(--mid);line-height:1.6">Timing isn't luck — it's the convergence of four forces that created the problem but haven't yet produced the solution. COps gets there first.</p></div>
-  <div class="pc" style="background:var(--green)"><div class="pl" style="color:rgba(0,0,0,.45)">Strongest signal</div><div style="font-size:.95rem;font-weight:700">Accenture buys Whalar for $300M</div><div style="font-size:.78rem;margin-top:4px;color:rgba(0,0,0,.55)">The market already recognizes creative ops as a billion-dollar asset.</div></div>
-  <div class="pr"><div class="pc"><div class="pl">In-house agencies</div><div class="pb2">82%</div><div class="ps2">of brands (ANA)</div></div><div class="pc"><div class="pl">Cut their agency</div><div class="pb2">60%</div><div class="ps2">eMarketer 2025</div></div></div>
+  <div class="pc on-green" style="background:var(--green)"><div class="pl" style="color:rgba(0,0,0,.45)">Strongest signal</div><div style="font-size:.95rem;font-weight:700">Accenture buys Whalar for $300M<a class="src" href="https://newsroom.accenture.com/news/2026/accenture-to-acquire-leading-creator-and-social-agency-whalar-from-whalar-group" target="_blank" rel="noopener" data-tip="Accenture Newsroom 2026"></a></div><div style="font-size:.78rem;margin-top:4px;color:rgba(0,0,0,.55)">The market already recognizes creative ops as a billion-dollar asset.</div></div>
+  <div class="pr"><div class="pc"><div class="pl">In-house agencies</div><div class="pb2">82%</div><div class="ps2">of brands (ANA)<a class="src" href="https://www.emarketer.com/content/faq-on-ad-agencies--consolidation--ai-disruption--what-s-changing-2026" target="_blank" rel="noopener" data-tip="ANA / eMarketer 2026"></a></div></div><div class="pc"><div class="pl">Cut their agency</div><div class="pb2">60%</div><div class="ps2">eMarketer 2025<a class="src" href="https://www.emarketer.com/content/faq-on-ad-agencies--consolidation--ai-disruption--what-s-changing-2026" target="_blank" rel="noopener" data-tip="eMarketer 2026"></a></div></div></div>
   <div class="pc"><div class="pl">Why not sooner</div><p style="font-size:.82rem;color:var(--mid);line-height:1.5">The pain existed, but the market kept trying to fix it with more agency or freelancers. AI made it obvious the problem is operational, not about volume.</p></div>
 </div>
 
@@ -656,8 +739,21 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
 <!-- mercado -->
 <div class="ps" id="state-mercado">
   <div class="pc"><div class="pl">Market Context</div><p style="font-size:.84rem;color:var(--mid);line-height:1.6">In-housing + agency cuts created the exact gap where COps operates.</p></div>
-  <div class="pr"><div class="pc"><div class="pl">In-house</div><div class="pb2">82%</div><div class="ps2">of brands (ANA)</div></div><div class="pc"><div class="pl">Cut their agency</div><div class="pb2">60%</div><div class="ps2">eMarketer 2025</div></div></div>
-  <div class="pc" style="background:var(--green)"><div class="pl" style="color:rgba(0,0,0,.45)">Strongest signal</div><div style="font-size:.95rem;font-weight:700">Accenture buys Whalar for $300M</div><div style="font-size:.78rem;margin-top:4px;color:rgba(0,0,0,.55)">Recurring creative ops as a billion-dollar asset.</div></div>
+  <div class="pr"><div class="pc"><div class="pl">In-house</div><div class="pb2">82%</div><div class="ps2">of brands (ANA)<a class="src" href="https://www.emarketer.com/content/faq-on-ad-agencies--consolidation--ai-disruption--what-s-changing-2026" target="_blank" rel="noopener" data-tip="ANA / eMarketer 2026"></a></div></div><div class="pc"><div class="pl">Cut their agency</div><div class="pb2">60%</div><div class="ps2">eMarketer 2025<a class="src" href="https://www.emarketer.com/content/faq-on-ad-agencies--consolidation--ai-disruption--what-s-changing-2026" target="_blank" rel="noopener" data-tip="eMarketer 2026"></a></div></div></div>
+  <div class="pc on-green" style="background:var(--green)"><div class="pl" style="color:rgba(0,0,0,.45)">Strongest signal</div><div style="font-size:.95rem;font-weight:700">Accenture buys Whalar for $300M<a class="src" href="https://newsroom.accenture.com/news/2026/accenture-to-acquire-leading-creator-and-social-agency-whalar-from-whalar-group" target="_blank" rel="noopener" data-tip="Accenture Newsroom 2026"></a></div><div style="font-size:.78rem;margin-top:4px;color:rgba(0,0,0,.55)">Recurring creative ops as a billion-dollar asset.</div></div>
+</div>
+
+<!-- journey -->
+<div class="ps" id="state-journey">
+  <div class="pc"><div class="pl">6 years, one problem</div><p style="font-size:.84rem;color:var(--mid);line-height:1.6">Agency → art direction → in-house → founder. The same gap kept reappearing: strategy and production exist, but the operating layer between them doesn't.</p></div>
+  <div class="pc on-green" style="background:var(--green)"><div class="pl" style="color:rgba(0,0,0,.45)">First contract</div><div style="font-size:1.5rem;font-weight:800">US$1,800 → R$10k base</div><div style="font-size:.78rem;margin-top:4px;color:rgba(0,0,0,.55)">The negotiation itself proved the delivered value sustains the recurring ticket.</div></div>
+  <div class="pc"><div class="pl">What each side taught</div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:5px">
+      <div style="display:flex;gap:9px;font-size:.8rem"><span style="font-weight:700;width:70px;flex-shrink:0">Buyer</span><span style="color:var(--mid)">creative investment isn't treated as a necessity</span></div>
+      <div style="display:flex;gap:9px;font-size:.8rem"><span style="font-weight:700;width:70px;flex-shrink:0">Maker</span><span style="color:var(--mid)">value goes unrecognized, payment unstable</span></div>
+      <div style="display:flex;gap:9px;font-size:.8rem"><span style="font-weight:700;width:70px;flex-shrink:0">Inside</span><span style="color:var(--mid)">the pain is operational — it became a system</span></div>
+    </div>
+  </div>
 </div>
 
 <!-- time -->
@@ -778,6 +874,42 @@ function triggerComp(){
   cdots.forEach((d,i)=>setTimeout(()=>d.classList.add('vis'),i*140));
 }
 
+// journey — fixed timeline, hover/click to reveal detail
+const jt2Lanes=document.querySelectorAll('.jt2-lane');
+let tlDone=false;
+function triggerTL(){
+  if(tlDone)return;tlDone=true;
+  jt2Lanes.forEach((l,i)=>setTimeout(()=>l.classList.add('vis'),i*130));
+}
+// single floating popover appended to <body> — escapes all stacking contexts
+const jt2pop=document.createElement('div');jt2pop.className='jt2-pop2';document.body.appendChild(jt2pop);
+let jt2Pinned=null;
+function jt2Place(it){
+  jt2pop.innerHTML=it.querySelector('.jt2-pop').innerHTML;
+  jt2pop.classList.add('show');
+  const r=it.getBoundingClientRect(),pw=jt2pop.offsetWidth,isR=it.classList.contains('r');
+  let left=isR?(r.right-pw):r.left;
+  left=Math.max(8,Math.min(left,window.innerWidth-pw-8));
+  jt2pop.style.left=left+'px';
+  jt2pop.style.top=(r.bottom+10)+'px';
+  const anchor=isR?(r.right-left-18):(r.left-left+18);
+  jt2pop.style.setProperty('--arrow',Math.max(12,Math.min(anchor,pw-12))+'px');
+}
+function jt2Hide(){jt2pop.classList.remove('show');}
+document.querySelectorAll('.jt2-item').forEach(it=>{
+  it.addEventListener('mouseenter',()=>{if(!jt2Pinned){it.classList.add('open');jt2Place(it);}});
+  it.addEventListener('mouseleave',()=>{if(!jt2Pinned){it.classList.remove('open');jt2Hide();}});
+  it.addEventListener('click',e=>{
+    e.stopPropagation();
+    if(jt2Pinned===it){jt2Pinned=null;it.classList.remove('open');jt2Hide();}
+    else{document.querySelectorAll('.jt2-item.open').forEach(o=>o.classList.remove('open'));jt2Pinned=it;it.classList.add('open');jt2Place(it);}
+  });
+});
+document.addEventListener('click',()=>{if(jt2Pinned){jt2Pinned.classList.remove('open');jt2Pinned=null;jt2Hide();}});
+const jt2nar=document.getElementById('narrative');
+if(jt2nar)jt2nar.addEventListener('scroll',()=>{if(jt2Pinned){jt2Pinned.classList.remove('open');jt2Pinned=null;}jt2Hide();});
+window.addEventListener('resize',()=>{if(jt2Pinned)jt2Place(jt2Pinned);});
+
 // venn — floating circles that repel from the cursor
 const vennEl=document.getElementById('venn');
 let vennStarted=false;
@@ -835,10 +967,10 @@ const sections=document.querySelectorAll('.section');
 const narrative=document.getElementById('narrative');
 const pCtx=document.getElementById('pCtx');
 const prog=document.getElementById('prog');
-const labels={overview:'Overview',custo:'Cost Simulator',solucao:'The Solution',whynow:'Why Now',produto:'The Product',diferencial:'Positioning',mercado:'Market Signals',time:'Team',tam:'Addressable Market',receita:'Revenue Simulator',investimento:'Investment Simulator'};
+const labels={overview:'Overview',custo:'Cost Simulator',solucao:'The Solution',whynow:'Why Now',produto:'The Product',diferencial:'Positioning',mercado:'Market Signals',journey:'The Journey',time:'Team',tam:'Addressable Market',receita:'Revenue Simulator',investimento:'Investment Simulator'};
 
 const navMapEl=document.getElementById('navDots');
-const navNames=['Intro','Problem','Solution','Why now','Product','Positioning','Market signals','Team','TAM · SAM · SOM','Revenue model','The raise'];
+const navNames=['Intro','Problem','Solution','Why now','Product','Positioning','Market signals','Journey','Team','TAM · SAM · SOM','Revenue model','The raise'];
 const navTrack=document.createElement('div');navTrack.className='nav-track';
 const navTrackFill=document.createElement('div');navTrackFill.className='nav-track-fill';
 navTrack.appendChild(navTrackFill);navMapEl.appendChild(navTrack);
@@ -879,6 +1011,7 @@ function goTo(idx){
   if(s.id==='sec-prod')triggerSteps();
   if(s.id==='sec-comp')triggerComp();
   if(s.dataset.panel==='solucao')triggerVenn();
+  if(s.dataset.panel==='journey')triggerTL();
   if(s.dataset.panel==='tam')triggerTam();
   switchPanel(s.dataset.panel);
   dotEls.forEach((d,i)=>d.classList.toggle('active',i===idx));
